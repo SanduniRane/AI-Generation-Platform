@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Generation Platform — Through the Eras</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:#050a14;
+  --panel:#0b1120;
+  --border:#1a2a4a;
+  --glow-1:#00f5ff;
+  --glow-2:#7b2fff;
+  --glow-3:#ff3cac;
+  --glow-4:#ffaa00;
+  --text:#c8d8f0;
+  --text-dim:#5a7090;
+  --chat-bg:#070d1a;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;overflow-x:hidden;}
+
+/* ── Starfield ── */
+.starfield{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle linear infinite;}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:1}}
+
+/* ── Header ── */
+header{position:relative;z-index:10;text-align:center;padding:32px 20px 20px;}
+.header-title{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(1.4rem,4vw,2.6rem);
+  font-weight:900;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  background:linear-gradient(90deg,var(--glow-1),var(--glow-2),var(--glow-3));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(0,245,255,.3));
+  animation:titleShimmer 4s ease-in-out infinite;
+}
+@keyframes titleShimmer{0%,100%{filter:drop-shadow(0 0 20px rgba(0,245,255,.3))}50%{filter:drop-shadow(0 0 35px rgba(123,47,255,.5))}}
+.header-sub{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--text-dim);letter-spacing:2px;margin-top:6px;}
+
+/* ── Timeline Track ── */
+.timeline-wrap{position:relative;z-index:5;padding:0 20px 10px;max-width:1100px;margin:0 auto;}
+.timeline-track{
+  position:relative;
+  display:flex;
+  align-items:flex-end;
+  gap:0;
+  height:280px;
+  border-bottom:2px solid rgba(0,245,255,.2);
+  overflow-x:auto;
+  overflow-y:visible;
+  scrollbar-width:thin;
+  scrollbar-color:var(--glow-2) transparent;
+  padding-bottom:0;
+}
+.timeline-track::-webkit-scrollbar{height:4px;}
+.timeline-track::-webkit-scrollbar-track{background:transparent;}
+.timeline-track::-webkit-scrollbar-thumb{background:var(--glow-2);border-radius:2px;}
+
+/* Connector line */
+.timeline-line{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,var(--glow-1),var(--glow-2),var(--glow-3),var(--glow-4));
+  filter:blur(.5px);
+  z-index:1;
+}
+
+/* ── Era Cards ── */
+.era-card{
+  flex:0 0 170px;
+  position:relative;
+  cursor:pointer;
+  z-index:2;
+  transition:all .35s cubic-bezier(.34,1.56,.64,1);
+  padding:0 10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.era-card:hover,.era-card.active{transform:translateY(-12px) scale(1.04);}
+
+.era-tower{
+  width:100%;
+  border-radius:12px 12px 0 0;
+  position:relative;
+  overflow:hidden;
+  border:1.5px solid transparent;
+  transition:border-color .3s, box-shadow .3s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  padding-bottom:12px;
+}
+.era-card:hover .era-tower,.era-card.active .era-tower{
+  border-color:var(--era-color);
+  box-shadow:0 0 30px -5px var(--era-color), inset 0 0 20px rgba(0,0,0,.4);
+}
+
+/* Era-specific heights and colors */
+.era-1{--era-color:var(--glow-4);} .era-1 .era-tower{height:90px;background:linear-gradient(180deg,rgba(255,170,0,.12),rgba(255,170,0,.03));}
+.era-2{--era-color:#39ff14;} .era-2 .era-tower{height:110px;background:linear-gradient(180deg,rgba(57,255,20,.12),rgba(57,255,20,.03));}
+.era-3{--era-color:#00bfff;} .era-3 .era-tower{height:135px;background:linear-gradient(180deg,rgba(0,191,255,.12),rgba(0,191,255,.03));}
+.era-4{--era-color:var(--glow-2);} .era-4 .era-tower{height:165px;background:linear-gradient(180deg,rgba(123,47,255,.15),rgba(123,47,255,.03));}
+.era-5{--era-color:var(--glow-1);} .era-5 .era-tower{height:195px;background:linear-gradient(180deg,rgba(0,245,255,.15),rgba(0,245,255,.03));}
+.era-6{--era-color:var(--glow-3);} .era-6 .era-tower{height:230px;background:linear-gradient(180deg,rgba(255,60,172,.18),rgba(255,60,172,.04));}
+
+.era-icon{font-size:2rem;margin-bottom:6px;filter:drop-shadow(0 0 8px var(--era-color));animation:iconFloat 3s ease-in-out infinite;}
+.era-card:nth-child(2) .era-icon{animation-delay:.3s}
+.era-card:nth-child(3) .era-icon{animation-delay:.6s}
+.era-card:nth-child(4) .era-icon{animation-delay:.9s}
+.era-card:nth-child(5) .era-icon{animation-delay:1.2s}
+.era-card:nth-child(6) .era-icon{animation-delay:1.5s}
+@keyframes iconFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+.era-year{
+  font-family:'Orbitron',monospace;
+  font-size:.65rem;
+  font-weight:700;
+  color:var(--era-color);
+  letter-spacing:2px;
+  text-align:center;
+  padding:2px 8px;
+  border:1px solid var(--era-color);
+  border-radius:4px;
+  background:rgba(0,0,0,.5);
+}
+.era-name{
+  font-family:'Exo 2',sans-serif;
+  font-size:.72rem;
+  font-weight:600;
+  color:var(--text);
+  text-align:center;
+  margin-top:5px;
+  line-height:1.3;
+}
+.era-dot{
+  width:12px;height:12px;
+  border-radius:50%;
+  background:var(--era-color);
+  box-shadow:0 0 12px 3px var(--era-color);
+  margin-top:8px;
+  flex-shrink:0;
+  position:relative;
+  z-index:3;
+  transition:transform .2s;
+}
+.era-card:hover .era-dot,.era-card.active .era-dot{transform:scale(1.5);}
+
+/* Scan line on active */
+.era-card.active .era-tower::after{
+  content:'';
+  position:absolute;
+  left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--era-color),transparent);
+  animation:scanLine 1.5s linear infinite;
+  top:0;
+}
+@keyframes scanLine{0%{top:0;opacity:1}100%{top:100%;opacity:0}}
+
+/* Particles inside tower */
+.particle{
+  position:absolute;
+  width:3px;height:3px;
+  border-radius:50%;
+  background:var(--era-color);
+  animation:particleRise 2s ease-in infinite;
+  opacity:0;
+}
+@keyframes particleRise{0%{opacity:0;bottom:0;}30%{opacity:1}100%{opacity:0;bottom:100%;transform:translateX(var(--drift,0px));}}
+
+/* ── Click Hint ── */
+.click-hint{text-align:center;font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--text-dim);letter-spacing:2px;padding:8px 0 14px;animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* ── Layout: timeline + chat ── */
+.main-layout{
+  display:grid;
+  grid-template-columns:1fr 380px;
+  gap:0;
+  max-width:1100px;
+  margin:0 auto;
+  padding:0 20px 40px;
+  position:relative;
+  z-index:5;
+}
+@media(max-width:760px){
+  .main-layout{grid-template-columns:1fr;}
+}
+
+/* ── Info Panel ── */
+.info-panel{
+  padding:20px 24px 20px 0;
+  border-right:1px solid var(--border);
+}
+.info-placeholder{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  color:var(--text-dim);
+  font-family:'Share Tech Mono',monospace;
+  font-size:.82rem;
+  text-align:center;
+}
+.info-placeholder .big-icon{font-size:3.5rem;opacity:.3;animation:iconFloat 3s ease-in-out infinite;}
+.info-placeholder p{letter-spacing:1px;line-height:1.7;}
+
+.era-detail{display:none;animation:fadeSlide .4s ease both;}
+.era-detail.show{display:block;}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.era-detail-header{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:16px;
+}
+.detail-icon{font-size:2.8rem;filter:drop-shadow(0 0 12px var(--active-color,#0ff));}
+.detail-era-tag{
+  font-family:'Orbitron',monospace;
+  font-size:.65rem;
+  font-weight:700;
+  color:var(--active-color,#0ff);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  border:1px solid var(--active-color,#0ff);
+  padding:2px 10px;
+  border-radius:4px;
+  display:inline-block;
+  margin-bottom:5px;
+}
+.detail-title{
+  font-family:'Orbitron',monospace;
+  font-size:1.1rem;
+  font-weight:700;
+  color:#fff;
+}
+
+.tech-tags{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0;}
+.tech-tag{
+  font-family:'Share Tech Mono',monospace;
+  font-size:.68rem;
+  padding:3px 10px;
+  border-radius:20px;
+  border:1px solid var(--active-color,#0ff);
+  color:var(--active-color,#0ff);
+  background:rgba(0,0,0,.4);
+  transition:background .2s;
+}
+.tech-tag:hover{background:rgba(0,245,255,.1);}
+
+.detail-desc{
+  font-size:.87rem;
+  line-height:1.75;
+  color:var(--text);
+  margin-bottom:16px;
+}
+
+.milestones{list-style:none;}
+.milestones li{
+  font-size:.82rem;
+  padding:6px 0 6px 20px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  position:relative;
+  color:var(--text);
+  line-height:1.5;
+}
+.milestones li::before{
+  content:'▸';
+  position:absolute;left:0;
+  color:var(--active-color,#0ff);
+  font-size:.8rem;
+}
+
+.ask-btn{
+  margin-top:18px;
+  width:100%;
+  padding:11px 20px;
+  font-family:'Orbitron',monospace;
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:#000;
+  background:var(--active-color,#0ff);
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  transition:all .2s;
+  box-shadow:0 0 20px rgba(0,245,255,.3);
+}
+.ask-btn:hover{filter:brightness(1.2);transform:translateY(-2px);box-shadow:0 6px 25px rgba(0,245,255,.4);}
+
+/* ── Chat Panel ── */
+.chat-wrap{
+  padding:20px 0 20px 20px;
+  display:flex;
+  flex-direction:column;
+  height:520px;
+}
+.chat-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:0;
+}
+.ai-orb{
+  width:38px;height:38px;
+  border-radius:50%;
+  background:conic-gradient(var(--glow-1),var(--glow-2),var(--glow-3),var(--glow-1));
+  animation:orbSpin 4s linear infinite;
+  flex-shrink:0;
+  box-shadow:0 0 15px rgba(0,245,255,.4);
+}
+@keyframes orbSpin{from{rotate:0deg}to{rotate:360deg}}
+.chat-header-text h3{
+  font-family:'Orbitron',monospace;
+  font-size:.78rem;
+  font-weight:700;
+  color:#fff;
+  letter-spacing:1px;
+}
+.chat-header-text p{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim);}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#00ff88;box-shadow:0 0 6px #00ff88;animation:statusPulse 2s ease-in-out infinite;margin-left:auto;}
+@keyframes statusPulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.messages{
+  flex:1;
+  overflow-y:auto;
+  padding:14px 0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border) transparent;
+}
+.messages::-webkit-scrollbar{width:3px;}
+.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+.msg{
+  max-width:88%;
+  border-radius:12px;
+  padding:9px 13px;
+  font-size:.82rem;
+  line-height:1.6;
+  animation:msgIn .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes msgIn{from{opacity:0;transform:scale(.88) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.msg-bot{
+  align-self:flex-start;
+  background:rgba(0,245,255,.06);
+  border:1px solid rgba(0,245,255,.15);
+  color:var(--text);
+  border-bottom-left-radius:3px;
+}
+.msg-user{
+  align-self:flex-end;
+  background:rgba(123,47,255,.12);
+  border:1px solid rgba(123,47,255,.25);
+  color:#d0c0ff;
+  border-bottom-right-radius:3px;
+}
+.msg-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:.6rem;
+  letter-spacing:1px;
+  opacity:.55;
+  margin-bottom:3px;
+  display:block;
+}
+
+.typing{
+  align-self:flex-start;
+  background:rgba(0,245,255,.06);
+  border:1px solid rgba(0,245,255,.15);
+  border-radius:12px 12px 12px 3px;
+  padding:10px 16px;
+  display:none;
+  gap:5px;
+  align-items:center;
+}
+.typing.show{display:flex;}
+.t-dot{width:7px;height:7px;border-radius:50%;background:var(--glow-1);animation:tDot 1.2s ease-in-out infinite;}
+.t-dot:nth-child(2){animation-delay:.2s} .t-dot:nth-child(3){animation-delay:.4s}
+@keyframes tDot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}}
+
+.chat-input-area{
+  display:flex;
+  gap:8px;
+  padding-top:12px;
+  border-top:1px solid var(--border);
+}
+#chatInput{
+  flex:1;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:9px 14px;
+  font-family:'Exo 2',sans-serif;
+  font-size:.83rem;
+  color:var(--text);
+  outline:none;
+  transition:border-color .2s;
+  resize:none;
+}
+#chatInput:focus{border-color:var(--glow-1);}
+#chatInput::placeholder{color:var(--text-dim);}
+.api-key-row{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:12px 0 0;
+}
+.api-key-row label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:.66rem;
+  color:var(--text-dim);
+  letter-spacing:1px;
+}
+.api-key-row input{
+  width:100%;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:10px 12px;
+  color:var(--text);
+  font-size:.82rem;
+  outline:none;
+  transition:border-color .2s;
+}
+.api-key-row input:focus{border-color:var(--glow-1);}
+.api-key-row small{
+  color:var(--text-dim);
+  font-size:.65rem;
+}
+.send-btn{
+  width:40px;height:40px;
+  border-radius:8px;
+  background:linear-gradient(135deg,var(--glow-2),var(--glow-1));
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  transition:all .2s;
+}
+.send-btn:hover{transform:scale(1.1);box-shadow:0 0 15px rgba(0,245,255,.4);}
+.send-btn svg{fill:#000;width:18px;height:18px;}
+
+/* Quick prompts */
+.quick-row{display:flex;flex-wrap:wrap;gap:5px;padding:8px 0 0;}
+.qbtn{
+  font-family:'Share Tech Mono',monospace;
+  font-size:.63rem;
+  padding:3px 10px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  color:var(--text-dim);
+  cursor:pointer;
+  letter-spacing:.5px;
+  transition:all .2s;
+}
+.qbtn:hover{border-color:var(--glow-1);color:var(--glow-1);}
+
+/* Grid dots background */
+.grid-bg{
+  position:fixed;inset:0;z-index:0;
+  background-image:radial-gradient(circle,rgba(0,245,255,.06) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="starfield" id="starfield"></div>
+
+<header>
+  <div class="header-title">AI Generation Platform</div>
+  <div class="header-sub">// EXPLORE THE EVOLUTION OF ARTIFICIAL INTELLIGENCE //</div>
+</header>
+
+<!-- Timeline -->
+<div class="timeline-wrap">
+  <div class="timeline-track" id="timeline">
+    <div class="timeline-line"></div>
+
+    <!-- Era 1 -->
+    <div class="era-card era-1" onclick="selectEra(0)" id="era-0">
+      <div class="era-tower">
+        <div class="era-icon">🧮</div>
+        <div class="era-year">1950–1969</div>
+      </div>
+      <div class="era-dot"></div>
+      <div class="era-name">Dawn of<br>Symbolic AI</div>
+    </div>
+
+    <!-- Era 2 -->
+    <div class="era-card era-2" onclick="selectEra(1)" id="era-1">
+      <div class="era-tower">
+        <div class="era-icon">🕹️</div>
+        <div class="era-year">1970–1989</div>
+      </div>
+      <div class="era-dot"></div>
+      <div class="era-name">Expert Systems<br>& AI Winters</div>
+    </div>
+
+    <!-- Era 3 -->
+    <div class="era-card era-3" onclick="selectEra(2)" id="era-2">
+      <div class="era-tower">
+        <div class="era-icon">🧠</div>
+        <div class="era-year">1990–2009</div>
+      </div>
+      <div class="era-dot"></div>
+      <div class="era-name">Machine<br>Learning Rise</div>
+    </div>
+
+    <!-- Era 4 -->
+    <div class="era-card era-4" onclick="selectEra(3)" id="era-3">
+      <div class="era-tower">
+        <div class="era-icon">🔬</div>
+        <div class="era-year">2010–2016</div>
+      </div>
+      <div class="era-dot"></div>
+      <div class="era-name">Deep Learning<br>Revolution</div>
+    </div>
+
+    <!-- Era 5 -->
+    <div class="era-card era-5" onclick="selectEra(4)" id="era-4">
+      <div class="era-tower">
+        <div class="era-icon">⚡</div>
+        <div class="era-year">2017–2022</div>
+      </div>
+      <div class="era-dot"></div>
+      <div class="era-name">Transformer<br>Age</div>
+    </div>
+
+    <!-- Era 6 -->
+    <div class="era-card era-6" onclick="selectEra(5)" id="era-5">
+      <div class="era-tower">
+        <div class="era-icon">🚀</div>
+        <div class="era-year">2023–NOW</div>
+      </div>
+      <div class="era-dot"></div>
+      <div class="era-name">Generative AI<br>Explosion</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="click-hint">▼ CLICK AN ERA TO EXPLORE ▼</div>
+
+<!-- Main layout -->
+<div class="main-layout">
+
+  <!-- Info Panel -->
+  <div class="info-panel" id="infoPanel">
+    <div class="info-placeholder" id="infoPlaceholder">
+      <div class="big-icon">🤖</div>
+      <p>SELECT AN ERA FROM THE<br>TIMELINE ABOVE<br><br>TO EXPLORE AI HISTORY<br>& CHAT WITH THE AI GUIDE</p>
+    </div>
+
+    <!-- Era Detail blocks (hidden by default) -->
+    <div class="era-detail" id="detail-0" style="--active-color:#ffaa00">
+      <div class="era-detail-header">
+        <div class="detail-icon">🧮</div>
+        <div class="detail-title-block">
+          <span class="detail-era-tag">1950 – 1969</span>
+          <div class="detail-title">Dawn of Symbolic AI</div>
+        </div>
+      </div>
+      <div class="tech-tags">
+        <span class="tech-tag">Logic Theorist</span><span class="tech-tag">Turing Test</span>
+        <span class="tech-tag">LISP</span><span class="tech-tag">Search Algorithms</span>
+        <span class="tech-tag">Perceptron</span>
+      </div>
+      <p class="detail-desc">The birth of AI as a formal discipline. Researchers believed that human intelligence could be precisely described and simulated with symbolic rules. Computers began solving geometry problems, playing chess, and proving theorems — feats once thought uniquely human.</p>
+      <ul class="milestones">
+        <li>1950 — Alan Turing proposes the Turing Test in "Computing Machinery and Intelligence"</li>
+        <li>1956 — Dartmouth Conference coins the term "Artificial Intelligence"</li>
+        <li>1957 — Frank Rosenblatt builds the Perceptron, the first neural network</li>
+        <li>1958 — John McCarthy creates LISP, the AI programming language</li>
+        <li>1965 — ELIZA chatbot demonstrates natural language processing</li>
+      </ul>
+      <button class="ask-btn" onclick="sendEraChat(0)">⚡ ASK AI ABOUT THIS ERA</button>
+    </div>
+
+    <div class="era-detail" id="detail-1" style="--active-color:#39ff14">
+      <div class="era-detail-header">
+        <div class="detail-icon">🕹️</div>
+        <div class="detail-title-block">
+          <span class="detail-era-tag">1970 – 1989</span>
+          <div class="detail-title">Expert Systems & AI Winters</div>
+        </div>
+      </div>
+      <div class="tech-tags">
+        <span class="tech-tag">Expert Systems</span><span class="tech-tag">MYCIN</span>
+        <span class="tech-tag">Prolog</span><span class="tech-tag">Knowledge Base</span>
+        <span class="tech-tag">AI Winter</span>
+      </div>
+      <p class="detail-desc">AI oscillated between hype and disillusionment. Expert systems encoded human domain knowledge into rule-based engines and achieved real commercial success in medicine and finance. But brittle reasoning and massive hardware costs triggered two "AI Winters" — periods of severe funding cuts.</p>
+      <ul class="milestones">
+        <li>1972 — MYCIN, expert system for medical diagnosis, is developed at Stanford</li>
+        <li>1973 — Lighthill Report triggers first AI Winter in the UK</li>
+        <li>1974–80 — First AI Winter: funding dried up globally</li>
+        <li>1980 — Expert systems boom; XCON saves DEC $40M/year</li>
+        <li>1987–93 — Second AI Winter follows collapse of LISP machine market</li>
+      </ul>
+      <button class="ask-btn" onclick="sendEraChat(1)">⚡ ASK AI ABOUT THIS ERA</button>
+    </div>
+
+    <div class="era-detail" id="detail-2" style="--active-color:#00bfff">
+      <div class="era-detail-header">
+        <div class="detail-icon">🧠</div>
+        <div class="detail-title-block">
+          <span class="detail-era-tag">1990 – 2009</span>
+          <div class="detail-title">Machine Learning Rise</div>
+        </div>
+      </div>
+      <div class="tech-tags">
+        <span class="tech-tag">SVMs</span><span class="tech-tag">Decision Trees</span>
+        <span class="tech-tag">Deep Blue</span><span class="tech-tag">Backpropagation</span>
+        <span class="tech-tag">Statistical NLP</span>
+      </div>
+      <p class="detail-desc">AI shifted from hand-coded rules to learning from data. Statistical methods, Support Vector Machines, and early neural networks outperformed symbolic approaches. IBM's Deep Blue defeating Kasparov in 1997 captured the world's imagination. The web began generating vast datasets that would fuel future breakthroughs.</p>
+      <ul class="milestones">
+        <li>1997 — IBM Deep Blue defeats world chess champion Garry Kasparov</li>
+        <li>1998 — LeCun's Convolutional Neural Network reads handwritten digits (MNIST)</li>
+        <li>2001 — Random Forests algorithm published by Breiman</li>
+        <li>2006 — Hinton's Deep Belief Networks re-ignite neural network research</li>
+        <li>2009 — ImageNet large-scale visual database launched</li>
+      </ul>
+      <button class="ask-btn" onclick="sendEraChat(2)">⚡ ASK AI ABOUT THIS ERA</button>
+    </div>
+
+    <div class="era-detail" id="detail-3" style="--active-color:#7b2fff">
+      <div class="era-detail-header">
+        <div class="detail-icon">🔬</div>
+        <div class="detail-title-block">
+          <span class="detail-era-tag">2010 – 2016</span>
+          <div class="detail-title">Deep Learning Revolution</div>
+        </div>
+      </div>
+      <div class="tech-tags">
+        <span class="tech-tag">CNNs</span><span class="tech-tag">AlexNet</span>
+        <span class="tech-tag">GANs</span><span class="tech-tag">ResNet</span>
+        <span class="tech-tag">GPU Computing</span><span class="tech-tag">RNNs</span>
+      </div>
+      <p class="detail-desc">GPU-accelerated deep learning demolished benchmarks across vision, speech, and games. AlexNet's 2012 ImageNet victory sparked a gold rush in deep learning. GANs enabled machines to generate photorealistic images. AlphaGo mastered the ancient game of Go — once thought impossible for AI — using deep reinforcement learning.</p>
+      <ul class="milestones">
+        <li>2012 — AlexNet wins ImageNet, slashing error rates by 41%; Deep Learning era begins</li>
+        <li>2014 — Ian Goodfellow invents Generative Adversarial Networks (GANs)</li>
+        <li>2015 — ResNet (152-layer) surpasses human accuracy on ImageNet</li>
+        <li>2016 — AlphaGo defeats Lee Sedol 4–1 at the game of Go</li>
+        <li>2016 — TensorFlow 1.0 released; democratizes deep learning</li>
+      </ul>
+      <button class="ask-btn" onclick="sendEraChat(3)">⚡ ASK AI ABOUT THIS ERA</button>
+    </div>
+
+    <div class="era-detail" id="detail-4" style="--active-color:#00f5ff">
+      <div class="era-detail-header">
+        <div class="detail-icon">⚡</div>
+        <div class="detail-title-block">
+          <span class="detail-era-tag">2017 – 2022</span>
+          <div class="detail-title">Transformer Age</div>
+        </div>
+      </div>
+      <div class="tech-tags">
+        <span class="tech-tag">Transformers</span><span class="tech-tag">BERT</span>
+        <span class="tech-tag">GPT-2/3</span><span class="tech-tag">Attention</span>
+        <span class="tech-tag">DALL·E</span><span class="tech-tag">Scaling Laws</span>
+      </div>
+      <p class="detail-desc">The paper "Attention Is All You Need" introduced the Transformer architecture, reshaping every AI domain. BERT and GPT-3 demonstrated that language models pre-trained at scale could adapt to almost any task. DALL·E brought text-to-image generation. Scaling laws revealed a simple truth: bigger models + more data = better intelligence.</p>
+      <ul class="milestones">
+        <li>2017 — "Attention Is All You Need" introduces the Transformer (Vaswani et al.)</li>
+        <li>2018 — BERT from Google sets new records across 11 NLP benchmarks</li>
+        <li>2019 — GPT-2 deemed "too dangerous to release"; later fully released</li>
+        <li>2020 — GPT-3 (175B params) shocks the world; few-shot learning emerges</li>
+        <li>2021 — DALL·E and CLIP: AI learns to link language and images</li>
+        <li>2022 — Stable Diffusion, Midjourney; image generation goes mainstream</li>
+      </ul>
+      <button class="ask-btn" onclick="sendEraChat(4)">⚡ ASK AI ABOUT THIS ERA</button>
+    </div>
+
+    <div class="era-detail" id="detail-5" style="--active-color:#ff3cac">
+      <div class="era-detail-header">
+        <div class="detail-icon">🚀</div>
+        <div class="detail-title-block">
+          <span class="detail-era-tag">2023 – PRESENT</span>
+          <div class="detail-title">Generative AI Explosion</div>
+        </div>
+      </div>
+      <div class="tech-tags">
+        <span class="tech-tag">ChatGPT</span><span class="tech-tag">LLMs</span>
+        <span class="tech-tag">RLHF</span><span class="tech-tag">Multimodal AI</span>
+        <span class="tech-tag">Agents</span><span class="tech-tag">Claude</span><span class="tech-tag">Gemini</span>
+      </div>
+      <p class="detail-desc">ChatGPT reached 100 million users in 2 months — the fastest product adoption in history. Large Language Models became creative co-pilots, coders, and reasoning engines. Multimodal AI unified vision, audio, and language. AI Agents began autonomously browsing the web, writing code, and orchestrating complex workflows.</p>
+      <ul class="milestones">
+        <li>2023 — ChatGPT reaches 100M users in 2 months; GPT-4 released</li>
+        <li>2023 — Claude, Gemini, Llama usher in a competitive LLM era</li>
+        <li>2023 — Stable Diffusion XL, Midjourney v5 push image quality boundaries</li>
+        <li>2024 — Sora generates cinematic video from text prompts</li>
+        <li>2024 — AI coding agents (Cursor, Devin) reshape software engineering</li>
+        <li>2025 — Multimodal reasoning models become industry standard</li>
+      </ul>
+      <button class="ask-btn" onclick="sendEraChat(5)">⚡ ASK AI ABOUT THIS ERA</button>
+    </div>
+
+  </div>
+
+  <!-- Chat Panel -->
+  <div class="chat-wrap">
+    <div class="chat-header">
+      <div class="ai-orb"></div>
+      <div class="chat-header-text">
+        <h3>NEXUS — AI HISTORIAN</h3>
+        <p>// ask anything about AI evolution</p>
+      </div>
+      <div class="status-dot"></div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="msg msg-bot">
+        <span class="msg-label">◈ NEXUS</span>
+        Greetings, explorer. I am NEXUS — your AI history guide. Select any era on the timeline to dive deep into that period, or ask me anything about artificial intelligence's evolution. What would you like to know?
+      </div>
+    </div>
+
+    <div class="typing" id="typing">
+      <div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>
+    </div>
+
+    <div class="quick-row">
+      <button class="qbtn" onclick="sq('What triggered the AI winters?')">AI Winters?</button>
+      <button class="qbtn" onclick="sq('How did deep learning change AI?')">Deep Learning?</button>
+      <button class="qbtn" onclick="sq('What makes transformers special?')">Transformers?</button>
+      <button class="qbtn" onclick="sq('What comes after generative AI?')">Future of AI?</button>
+    </div>
+
+    <div class="api-key-row">
+      <label for="apiKeyInput">Free LLM API Key</label>
+      <input id="apiKeyInput" type="password" value="" placeholder="Paste your OpenAI-compatible API key here" autocomplete="new-password" />
+      <small>Leave this blank to use the local AI knowledge base only, or paste your own OpenAI-compatible API key to enable LLM answers.</small>
+    </div>
+
+    <div class="chat-input-area">
+      <textarea id="chatInput" rows="1" placeholder="Ask about any AI era or technology…"
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+      <button class="send-btn" onclick="sendMsg()">
+        <svg viewBox="0 0 24 24"><path d="M2 12L22 2 12 22 10 14 2 12Z"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script src="ai_keywords.js"></script>
+<script>
+// Starfield
+(function(){
+  const sf=document.getElementById('starfield');
+  for(let i=0;i<160;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=Math.random()*2+.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s;`;
+    sf.appendChild(s);
+  }
+})();
+
+// Particles in towers
+(function(){
+  document.querySelectorAll('.era-tower').forEach(t=>{
+    for(let i=0;i<6;i++){
+      const p=document.createElement('div');
+      p.className='particle';
+      p.style.cssText=`left:${10+Math.random()*80}%;animation-delay:${Math.random()*2}s;animation-duration:${1.5+Math.random()*1.5}s;--drift:${-20+Math.random()*40}px;`;
+      t.appendChild(p);
+    }
+  });
+})();
+
+const ERA_COLORS=['#ffaa00','#39ff14','#00bfff','#7b2fff','#00f5ff','#ff3cac'];
+const ERA_NAMES=['Dawn of Symbolic AI (1950–1969)','Expert Systems & AI Winters (1970–1989)','Machine Learning Rise (1990–2009)','Deep Learning Revolution (2010–2016)','Transformer Age (2017–2022)','Generative AI Explosion (2023–Now)'];
+
+const ERA_PROMPTS=[
+  "I'm exploring the Dawn of Symbolic AI era (1950–1969). Explain the key AI technologies, breakthroughs, and why this era was foundational. Include the Turing Test, LISP, Perceptron, and early symbolic reasoning. Make it engaging and insightful.",
+  "I'm exploring the Expert Systems & AI Winters era (1970–1989). Explain expert systems, why they succeeded commercially, what caused the two AI Winters, and what lessons were learned. Be detailed and analytical.",
+  "I'm exploring the Machine Learning Rise era (1990–2009). Explain the shift from symbolic AI to statistical learning, key algorithms like SVMs and early neural networks, and the significance of Deep Blue and ImageNet. Be insightful.",
+  "I'm exploring the Deep Learning Revolution era (2010–2016). Explain how GPUs and AlexNet transformed AI, what GANs are, how AlphaGo worked, and why this era is considered a watershed moment. Include technical depth.",
+  "I'm exploring the Transformer Age (2017–2022). Explain the attention mechanism, why Transformers replaced RNNs, the progression from BERT to GPT-3, and how scaling laws changed AI development philosophy. Be technically insightful.",
+  "I'm exploring the Generative AI Explosion era (2023–Present). Explain ChatGPT's impact, RLHF, how LLMs work at a high level, multimodal AI, AI agents, and where this is all heading. Be visionary and detailed."
+];
+
+const SYSTEM=`You are NEXUS, an expert AI historian and futurist guide on an interactive AI Generation Platform. You have deep knowledge of every era of AI development — from Turing's early ideas to today's LLMs.
+
+When answering, always prioritize accuracy and grounding. Use the reference documents if they are relevant, and avoid guessing or inventing events, dates, or technical details. If the question is outside your documented scope, say that the answer is based on known AI concepts and clearly note when the specific detail is not directly referenced.
+
+Your style:
+- Authoritative yet conversational, like a brilliant professor who's also excited about the subject
+- Use precise technical terms but always explain them clearly
+- Reference specific papers, people, and dates when relevant
+- Draw connections between eras to show the arc of progress
+- Occasionally use metaphors to make complex ideas click
+- Keep responses focused and under 4 paragraphs
+- End with an intriguing insight or question that invites further exploration`;
+
+const DEFAULT_API_KEY = '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';
+
+let history=[];
+let activeEra=-1;
+let lastUserQuery='';
+let lastBotQuery='';
+const FEEDBACK_SAMPLES=[];
+let PATTERN_MODEL = null;
+
+function selectEra(idx){
+  document.querySelectorAll('.era-card').forEach((c,i)=>c.classList.toggle('active',i===idx));
+  document.querySelectorAll('.era-detail').forEach((d,i)=>d.classList.toggle('show',i===idx));
+  document.getElementById('infoPlaceholder').style.display='none';
+  activeEra=idx;
+  // update CSS variable for active color
+  document.documentElement.style.setProperty('--active-color',ERA_COLORS[idx]);
+}
+
+function addMsg(text,isBot,sourceQuery){
+  const m=document.getElementById('messages');
+  const d=document.createElement('div');
+  d.className='msg '+(isBot?'msg-bot':'msg-user');
+  if(isBot && sourceQuery){
+    d.dataset.query = sourceQuery;
+  }
+  d.innerHTML=`<span class="msg-label">${isBot?'◈ NEXUS':'◉ YOU'}</span>${esc(text)}`;
+  if(isBot){
+    const fb = document.createElement('div');
+    fb.className='feedback-row';
+    fb.innerHTML = `
+      <button class='feedback-btn' onclick='handleFeedback(this,true)'>👍 Good</button>
+      <button class='feedback-btn wrong' onclick='handleFeedback(this,false)'>👎 Wrong</button>
+    `;
+    d.appendChild(fb);
+  }
+  m.appendChild(d);
+  m.scrollTop=m.scrollHeight;
+}
+
+function handleFeedback(button,isCorrect){
+  const msgDiv = button.closest('.msg');
+  if(!msgDiv) return;
+  const query = msgDiv.dataset.query || lastUserQuery || lastBotQuery;
+  const container = button.parentElement;
+  if(isCorrect){
+    container.innerHTML = '<span class="feedback-notice">Thanks, this answer was marked good.</span>';
+    return;
+  }
+
+  if(!query){
+    container.innerHTML = '<span class="feedback-notice">Unable to learn from this response because the original query was not available.</span>';
+    return;
+  }
+
+  const correctedTopic = prompt('Please enter the correct AI topic or keyword for this question (for example: validation, deep learning, transformer, reinforcement learning):');
+  if(!correctedTopic || !correctedTopic.trim()){
+    return;
+  }
+
+  const normalizedTopic = correctedTopic.trim().toLowerCase();
+  FEEDBACK_SAMPLES.push({text: query.toLowerCase(), label: normalizedTopic});
+  retrainPatternModel();
+  container.innerHTML = `<span class="feedback-notice">Thanks, I learned that this query should map to “${esc(normalizedTopic)}”.</span>`;
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function setTyping(v){
+  const t=document.getElementById('typing');
+  t.className='typing'+(v?' show':'');
+  if(v)document.getElementById('messages').scrollTop=9999;
+}
+
+const NEXUS_KB=[
+  {
+    title:'Dawn of Symbolic AI',
+    aliases:['dawn of symbolic ai','symbolic ai'],
+    tags:['symbolic','turing','lisp','perceptron','turing test','logic','symbolic reasoning','logic theorist','knowledge representation','search','inference'],
+    content:'The birth of AI as a formal discipline. Researchers believed that human intelligence could be precisely described and simulated with symbolic rules. Early systems focused on knowledge representation, search, and logical inference. Key milestones include the 1950 Turing Test, the 1956 Dartmouth Conference, the first perceptron in 1957, and the creation of LISP in 1958.'
+  },
+  {
+    title:'Expert Systems & AI Winters',
+    aliases:['expert systems','ai winters','ai winter'],
+    tags:['expert systems','mycin','prolog','knowledge base','ai winter','expert','rules','brittle','inference engine','knowledge engineering'],
+    content:'AI oscillated between hype and disillusionment. Expert systems encoded human domain knowledge into rule-based engines and achieved commercial success in medicine and finance. But brittle reasoning, expensive knowledge engineering, and massive hardware costs triggered two AI Winters. Important events include MYCIN in 1972 and the 1973 Lighthill Report.'
+  },
+  {
+    title:'Machine Learning Rise',
+    aliases:['machine learning rise','machine learning era','machine learning period'],
+    tags:['machine learning','machine learning rise','svm','decision tree','deep blue','imagenet','statistical nlp','support vector machine','random forest','feature engineering','supervised learning','unsupervised learning','naive bayes','bayesian'],
+    content:'AI shifted from hand-coded rules to learning from data. Statistical methods, Support Vector Machines, decision trees, Naive Bayes, and ensemble models outperformed symbolic approaches in many tasks. Researchers invested in feature engineering, supervised and unsupervised learning, and the first large-scale practical systems. IBM Deep Blue defeated Kasparov in 1997, and ImageNet launched in 2009, showing that large labeled datasets could produce powerful image recognition systems and set the stage for modern deep learning.'
+  },
+  {
+    title:'Deep Learning Revolution',
+    aliases:['deep learning revolution'],
+    tags:['deep learning','alexnet','gan','resnet','alphago','gpu computing','rnn','deep belief network','backpropagation','cnn'],
+    content:'GPU-accelerated deep learning demolished benchmarks across vision, speech, and games. AlexNet won ImageNet in 2012, GANs generated realistic images, and AlphaGo defeated Lee Sedol in 2016 using deep reinforcement learning. This era made convolutional neural networks and backpropagation the dominant tools for AI.'
+  },
+  {
+    title:'Transformer Age',
+    aliases:['transformer age','transformer era'],
+    tags:['transformer','attention','bert','gpt','dall e','scaling laws','nlp','self-attention','pretraining','fine-tuning'],
+    content:'The paper "Attention Is All You Need" introduced the Transformer architecture, reshaping every AI domain. Transformers use self-attention to process sequences in parallel, enabling models like BERT and GPT to scale dramatically. DALL·E and CLIP showed that language and vision could be connected, and scaling laws revealed that more compute and data often lead to better performance.'
+  },
+  {
+    title:'Generative AI Explosion',
+    aliases:['generative ai explosion','generative ai era','generative ai period'],
+    tags:['generative ai explosion','chatgpt','llm','rlhf','multimodal','agent','claude','gemini','generative ai','foundation models','prompting','chatbots','diffusion','text to image','code generation'],
+    content:'The Generative AI Explosion is defined by large language and multimodal models that generate text, images, audio, and code. ChatGPT reached 100 million users in 2 months, and models like GPT-4, PaLM, Claude, and Gemini became widely used. Diffusion models such as Stable Diffusion and DALL·E advanced text-to-image generation, while reinforcement learning from human feedback and prompt engineering improved quality, safety, and grounded behavior.'
+  },
+  {
+    title:'Neural Networks and Modern Architectures',
+    tags:['neural networks','activation','layers','backpropagation','batch normalization','transformer','cnn','rnn','gru','lstm'],
+    content:'Modern AI architectures range from convolutional and recurrent neural networks to Transformers and graph neural networks. Key advances like batch normalization, dropout, and residual connections improved training stability and performance. These techniques power computer vision, speech recognition, and sequence modeling.'
+  },
+  {
+    title:'Reinforcement Learning and Agents',
+    tags:['reinforcement learning','agent','policy','reward','value function','alpha go','deep q','ppo','actor critic'],
+    content:'Reinforcement learning trains agents to make decisions by maximizing reward signals. Landmark systems like AlphaGo, DQN, PPO, and actor-critic algorithms taught AI to solve games, robotics, and planning tasks. Modern agents combine RL with large models and world models for more general behavior.'
+  },
+  {
+    title:'Multimodal and Foundation Models',
+    tags:['multimodal','vision','audio','text','foundation models','clip','dalle','stable diffusion','diffusion','embedding'],
+    content:'Foundation models are large, pretrained networks that can be adapted to many tasks. Multimodal models process multiple data types at once, such as text and images. Examples include CLIP, DALL·E, Stable Diffusion, and modern multimodal systems that understand vision, language, and audio together.'
+  },
+  {
+    title:'Ethics, Safety, and Responsible AI',
+    tags:['ethics','bias','privacy','safety','explainability','responsible ai','fairness','transparency','regulation'],
+    content:'Modern AI also focuses on ethics, safety, and trust. Important topics include bias mitigation, model explainability, privacy-preserving learning, and responsible deployment. Industry and governments are building frameworks to ensure AI systems are safe, fair, and accountable.'
+  }
+];
+
+function extractKeywords(text){
+  return (text.toLowerCase().match(/\b[a-z0-9]{3,}\b/g) || []).filter(w=>!['the','and','for','with','from','this','that','which','what','when','where','why','how','into','also','were','are','was','is','a','an','of','to','in','on','by','as','it','its','be','at','but','or','so','if','or','than','then','too','not','all','can','use','using','used','will','would'].includes(w));
+}
+
+function scoreEntry(query,entry){
+  const keywords=new Set(extractKeywords(query));
+  const lower = query.toLowerCase();
+  let score=0;
+  entry.tags.forEach(tag=>{
+    const term=tag.toLowerCase();
+    if(keywords.has(term)) score += 10;
+    if(lower.includes(term)) score += 5;
+  });
+  AI_KEYWORDS.forEach(k=>{
+    if(k.length > 2 && lower.includes(k)) score += 6;
+  });
+  entry.content.toLowerCase().split(/\W+/).forEach(token=>{
+    if(keywords.has(token)) score += 1;
+  });
+  if(entry.title.toLowerCase().includes('ai') && lower.includes('ai')) score += 2;
+  return score;
+}
+
+function matchExactDoc(query){
+  const q=query.toLowerCase();
+  for(const entry of NEXUS_KB){
+    const normalizedTitle=entry.title.toLowerCase();
+    if(q.includes(normalizedTitle)){
+      return entry;
+    }
+    if(entry.aliases && entry.aliases.some(alias=>q.includes(alias.toLowerCase()))){
+      return entry;
+    }
+    if(entry.tags.some(tag=>q.includes(tag.toLowerCase()))){
+      return entry;
+    }
+  }
+  return null;
+}
+
+function retrieveRelevantDocs(query,max=3){
+  const exact=matchExactDoc(query);
+  if(exact){
+    return [{entry:exact,score:999}];
+  }
+  const scored=NEXUS_KB.map(entry=>({entry,score:scoreEntry(query,entry)}));
+  return scored.filter(item=>item.score>0).sort((a,b)=>b.score-a.score).slice(0,max);
+}
+
+function findExplicitAnswer(query){
+  const q=query.toLowerCase();
+  if(/machine learning rise|machine learning era|machine learning period|what is machine learning|what is ml|machine learn/.test(q)){
+    return 'Machine Learning Rise refers to the period when AI shifted from hand-coded rules to data-driven statistical models. Researchers built systems using supervised learning, unsupervised learning, and feature engineering, applying algorithms such as SVMs, decision trees, Naive Bayes, and random forests. Landmark achievements like IBM Deep Blue beating Kasparov and the release of ImageNet showed that data plus learning algorithms could outperform earlier symbolic approaches on real-world problems.';
+  }
+  if(/what is supervised learning|define supervised learning|supervised learning/.test(q)){
+    return 'Supervised learning is a type of machine learning where the model is trained on labeled examples. Each training sample includes input features and the correct output, so the algorithm learns to map inputs to targets using methods such as linear regression, logistic regression, decision trees, support vector machines, and neural networks. Once trained, the model can predict the label for new, unseen data.';
+  }
+  if(/what is unsupervised learning|define unsupervised learning|unsupervised learning/.test(q)){
+    return 'Unsupervised learning is a machine learning approach where the algorithm finds patterns, structure, or relationships in unlabeled data. Common techniques include clustering, dimensionality reduction, and anomaly detection, and the model learns from the input distribution without explicit output labels.';
+  }
+  if(/what is reinforcement learning|define reinforcement learning|reinforcement learning/.test(q)){
+    return 'Reinforcement learning trains an agent to make decisions by rewarding desirable actions and penalizing undesirable ones. The agent interacts with an environment, learns from trial and error, and optimizes a policy to maximize cumulative reward. Popular algorithms include Q-learning, policy gradients, and actor-critic methods.';
+  }
+  if(/generative ai explosion|generative ai era|generative ai period|what is generative ai|what is generative artificial intelligence|what is gpt|what is chatgpt|chatgpt|gpt-4|diffusion|stable diffusion|text to image/.test(q)){
+    return 'The Generative AI Explosion is defined by the rise of large foundation models and multimodal systems that generate text, images, audio, and code. ChatGPT made conversational AI mainstream, while diffusion models like Stable Diffusion and DALL·E transformed text-to-image generation. Reinforcement Learning from Human Feedback, prompt engineering, and model scaling allowed these systems to produce coherent, creative outputs, and agents extended this capability to task completion and autonomous workflows.';
+  }
+  if(/ai winter|ai winters|winter/.test(q)){
+    return 'The AI Winters happened because early AI systems relied heavily on hand-crafted rules and domain expertise. Expert systems were brittle and expensive to maintain, and hardware limitations prevented the large-scale learning models needed for more flexible intelligence. When businesses and governments saw poor returns, investment dried up, creating two major funding contractions in the 1970s and late 1980s.';
+  }
+  if(/dawn of symbolic ai|symbolic ai|what is symbolic ai|dawn of symbolic/.test(q)){
+    return 'The Dawn of Symbolic AI describes the early period when researchers represented knowledge with symbols and logical rules. This era produced programs that could reason, prove theorems, and manipulate language in symbolic form. Important milestones include the Turing Test, the creation of LISP, and the first Perceptron, and it established the foundations for later statistical and neural approaches.';
+  }
+  if(/transformer|attention.*mechanism|self-attention|bert|gpt|attention/.test(q)){
+    return 'Transformers use a self-attention mechanism to compare every token in a sequence with every other token in parallel. This eliminates the sequential bottleneck of RNNs, enabling much faster training and better long-range context. Transformers became the foundation for models like BERT, GPT, and many state-of-the-art language and multimodal systems.';
+  }
+  if(/chatgpt|rlhf|llm|generative ai|agent|multimodal|foundation model/.test(q)){
+    return 'Generative AI today is powered by large foundation models trained on massive text and multimodal datasets. Reinforcement Learning from Human Feedback (RLHF) guides behavior towards helpful and safe outputs. Models like ChatGPT, Claude, and Gemini support chat, code generation, and multimodal reasoning, while agents extend these models to perform tasks autonomously.';
+  }
+  if(/deep learning|alexnet|gan|alphago|cnn|rnn|backpropagation/.test(q)){
+    return 'Deep learning uses multi-layer neural networks trained with backpropagation and gradient descent. GPUs and large datasets allowed networks such as AlexNet, ResNet, and GANs to achieve breakthroughs in vision and generation. AlphaGo combined deep networks with reinforcement learning to master the game of Go, demonstrating the power of modern AI architectures.';
+  }
+  if(/symbolic|turing test|lisp|perceptron|expert systems/.test(q)){
+    return 'Early AI focused on symbolic reasoning and rule-based systems. The Turing Test questioned whether machines could behave intelligently, LISP became the standard language for AI research, and the perceptron was the first trainable neural unit. Expert systems later applied rules to specific domains, but their brittleness led the field to seek more robust learning-based methods.';
+  }
+  if(/ethic|bias|privacy|safety|fairness|responsible ai|transparency/.test(q)){
+    return 'Responsible AI means designing systems that are fair, transparent, and safe. This includes reducing bias in data and models, explaining outputs, protecting privacy, and deploying with human oversight. Ethics is now a core part of modern AI development alongside technical performance.';
+  }
+  return null;
+}
+
+function escapeRegex(text){
+  return text.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+}
+
+function keywordMatchesQuery(keyword, query){
+  const normalizedKeyword = normalizeKeyword(keyword);
+  const normalizedQuery = query.toLowerCase().replace(/[\s_-]+/g, ' ');
+  if(!normalizedKeyword) return false;
+  const exactPattern = new RegExp('\\b' + escapeRegex(normalizedKeyword) + '\\b','i');
+  if(exactPattern.test(normalizedQuery)){
+    return true;
+  }
+  const fallbackWords = normalizedKeyword.split(' ').filter(Boolean);
+  if(fallbackWords.length > 1){
+    const lastWord = escapeRegex(fallbackWords[fallbackWords.length - 1]);
+    return new RegExp('\\b' + lastWord + '\\b','i').test(normalizedQuery);
+  }
+  return false;
+}
+
+function findKeywordAnswer(query){
+  const q = query.toLowerCase();
+  const matches = AI_KEYWORDS.filter(k => k.length > 2 && keywordMatchesQuery(k, q));
+  if(matches.length === 0) return null;
+  const keyword = matches.sort((a,b) => b.length - a.length || a.localeCompare(b))[0];
+  return generateKeywordResponse(keyword, q);
+}
+
+function tokenizeText(text){
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+function tokenCounts(text){
+  const counts = {};
+  tokenizeText(text).forEach(token => {
+    counts[token] = (counts[token] || 0) + 1;
+  });
+  return counts;
+}
+
+function trainPatternModel(){
+  const samples = [];
+  const seen = new Set();
+
+  AI_KEYWORDS.forEach(keyword => {
+    const label = normalizeKeyword(keyword);
+    if(!label) return;
+    const text = keyword.toLowerCase().replace(/_/g, ' ');
+    const key = `${label}::${text}`;
+    if(seen.has(key)) return;
+    seen.add(key);
+    samples.push({text, label});
+  });
+
+  const extraSamples = [
+    {text:'how do I validate a machine learning model', label:'validation'},
+    {text:'what is deep learning and how does it work', label:'deep learning'},
+    {text:'explain transformers and attention', label:'transformer'},
+    {text:'what is reinforcement learning in ai', label:'reinforcement learning'},
+    {text:'what is generative ai', label:'generative ai'},
+    {text:'how do multimodal models work', label:'multimodal'},
+    {text:'what are the ethics of ai', label:'ethics'},
+    {text:'how does model training happen', label:'training'},
+    {text:'what is inference in ai systems', label:'inference'}
+  ];
+
+  extraSamples.forEach(sample => samples.push(sample));
+  FEEDBACK_SAMPLES.forEach(sample => {
+    if(sample && sample.text && sample.label){
+      samples.push({text: sample.text.toLowerCase(), label: sample.label.toLowerCase()});
+    }
+  });
+
+  const classes = [...new Set(samples.map(s => s.label))].sort();
+  const weights = {};
+  const biases = {};
+
+  classes.forEach(label => {
+    weights[label] = {};
+    biases[label] = 0;
+  });
+
+  const learningRate = 0.15;
+  const epochs = 80;
+
+  for(let epoch = 0; epoch < epochs; epoch++){
+    samples.forEach(sample => {
+      const counts = tokenCounts(sample.text);
+      const scores = classes.map(label => {
+        let score = biases[label];
+        for(const token in counts){
+          score += (weights[label][token] || 0) * counts[token];
+        }
+        return score;
+      });
+
+      let predictedIndex = 0;
+      for(let i = 1; i < scores.length; i++){
+        if(scores[i] > scores[predictedIndex]) predictedIndex = i;
+      }
+      const actualIndex = classes.indexOf(sample.label);
+      if(predictedIndex !== actualIndex){
+        const actualLabel = classes[actualIndex];
+        const predictedLabel = classes[predictedIndex];
+        for(const token in counts){
+          weights[actualLabel][token] = (weights[actualLabel][token] || 0) + learningRate * counts[token];
+          weights[predictedLabel][token] = (weights[predictedLabel][token] || 0) - learningRate * counts[token];
+        }
+        biases[actualLabel] += learningRate;
+        biases[predictedLabel] -= learningRate;
+      }
+    });
+  }
+
+  return {classes, weights, biases};
+}
+
+function retrainPatternModel(){
+  PATTERN_MODEL = trainPatternModel();
+}
+
+PATTERN_MODEL = trainPatternModel();
+
+function predictPatternLabel(query){
+  if(!PATTERN_MODEL || !PATTERN_MODEL.classes.length) return null;
+  const counts = tokenCounts(query);
+  let bestLabel = null;
+  let bestScore = -Infinity;
+
+  PATTERN_MODEL.classes.forEach(label => {
+    let score = PATTERN_MODEL.biases[label] || 0;
+    for(const token in counts){
+      score += (PATTERN_MODEL.weights[label][token] || 0) * counts[token];
+    }
+    if(score > bestScore){
+      bestScore = score;
+      bestLabel = label;
+    }
+  });
+
+  return bestLabel;
+}
+
+function normalizeKeyword(keyword){
+  const prefixes = [
+    'ai',
+    'computer vision',
+    'data science',
+    'deep learning',
+    'few shot',
+    'few-shot',
+    'zero shot',
+    'zero-shot',
+    'self supervised',
+    'self-supervised',
+    'semi supervised',
+    'semi-supervised',
+    'supervised',
+    'unsupervised',
+    'reinforcement learning',
+    'natural language processing',
+    'nlp',
+    'vision',
+    'text',
+    'image',
+    'audio',
+    'speech',
+    'video',
+    'robotics',
+    'autonomous',
+    'foundation model',
+    'foundation models',
+    'multimodal',
+    'machine learning',
+    'transformer',
+    'chatgpt',
+    'bert',
+    'gpt'
+  ];
+  let normalized = keyword.toLowerCase().replace(/[_\-]+/g, ' ').trim();
+  const prefixPattern = new RegExp('^(?:' + prefixes.map(escapeRegex).join('|') + ')\\s+');
+  while(prefixPattern.test(normalized)){
+    const candidate = normalized.replace(prefixPattern, '').trim();
+    if(candidate.length === 0){
+      break;
+    }
+    normalized = candidate;
+  }
+  return normalized;
+}
+
+function formatKeywordDetails(label, meaning, uses, technologies, benefits, disadvantages, example){
+  let response = `"${label}"\nMeaning: ${meaning}\nUses: ${uses}\nTechnologies: ${technologies}\nBenefits: ${benefits}\nDisadvantages: ${disadvantages}`;
+  if(example){
+    response += `\nExample: ${example}`;
+  }
+  return response;
+}
+
+function generateKeywordResponse(keyword, query){
+  const lower = query.toLowerCase();
+  const isDefinition = /\b(what is|define|explain|meaning of|describe|tell me about)\b/.test(lower);
+  const isCompare = /\b(difference|compare|versus|vs|contrast)\b/.test(lower);
+  const isHow = /\bhow\b/.test(lower);
+  const isWhy = /\bwhy\b/.test(lower);
+  const label = keyword;
+  const sample = normalizeKeyword(label);
+
+  if(/\bself-supervised\b/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A training paradigm where models learn from raw data by predicting withheld parts of the input, creating supervisory signals from the data itself.',
+      'pretraining language and vision models, representation learning, feature extraction, and transfer learning.',
+      'masked language modeling, contrastive learning, SimCLR, BYOL, and transformer-based pretraining like BERT.',
+      'Scales to massive unlabeled datasets and produces strong representations for downstream tasks.',
+      'Pretraining can be expensive, and the learned features may not always align with specific downstream objectives.',
+      'For example, self-supervised learning trains language models to predict masked words or image models to reconstruct corrupted patches.'
+    );
+  }
+
+  if(/\bsemi-supervised\b/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A hybrid learning approach that uses a small amount of labeled data together with a larger pool of unlabeled data.',
+      'improving model accuracy with limited labels, bootstrapping classifiers, and leveraging unlabeled corpora.',
+      'pseudo-labeling, consistency regularization, graph-based methods, and generative models for unlabeled data.',
+      'Reduces the need for expensive labels while improving performance over purely supervised or unsupervised methods.',
+      'Can amplify label noise and requires careful handling of unlabeled examples to avoid degrading the model.',
+      'For example, semi-supervised learning is used to train text classifiers using a few annotated documents plus many unlabeled ones.'
+    );
+  }
+
+  if(/\bunsupervised\b/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A machine learning paradigm where models discover patterns and structure in unlabeled data without explicit target labels.',
+      'clustering, anomaly detection, dimensionality reduction, feature learning, and representation extraction.',
+      'k-means clustering, hierarchical clustering, principal component analysis (PCA), autoencoders, and self-organizing maps.',
+      'No need for labeled examples; useful for exploring data structure and discovering hidden patterns.',
+      'Harder to evaluate and interpret; results can be ambiguous and depend heavily on assumptions and hyperparameters.',
+      'For example, unsupervised learning groups customers by behavior or extracts latent topics from text collections.'
+    );
+  }
+
+  if(/\bsupervised\b/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A machine learning paradigm where models learn from labeled examples, with input features paired to known outputs.',
+      'classification, regression, and prediction tasks in vision, NLP, tabular data, and recommendation systems.',
+      'decision trees, support vector machines, logistic regression, neural networks, gradient descent, and backpropagation.',
+      'Strong performance when good labeled data is available; clear training objectives and easy evaluation.',
+      'Requires labeled data, which can be expensive to collect; can overfit if the model memorizes the training labels.',
+      'For example, supervised learning is used to train image classifiers, sentiment analyzers, and fraud detectors from labeled datasets.'
+    );
+  }
+
+  if(/reinforcement/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A learning paradigm where an agent interacts with an environment to maximize cumulative reward through trial and error.',
+      'robotics, game playing, control systems, recommendation engines, and sequential decision-making problems.',
+      'Q-learning, deep Q-networks (DQN), policy gradients, actor-critic methods, reward shaping, and temporal-difference learning.',
+      'Learns complex behaviors from experience and can optimize long-term outcomes in sequential tasks.',
+      'Often requires large amounts of interaction data, careful reward design, and can be unstable or sample-inefficient.',
+      'For example, reinforcement learning powers autonomous agents that learn to play games such as Go or control robots in simulation.'
+    );
+  }
+
+  if(/semi-supervised/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A hybrid learning approach that uses a small amount of labeled data together with a larger pool of unlabeled data.',
+      'improving model accuracy with limited labels, bootstrapping classifiers, and leveraging unlabeled corpora.',
+      'pseudo-labeling, consistency regularization, graph-based methods, and generative models for unlabeled data.',
+      'Reduces the need for expensive labels while improving performance over purely supervised or unsupervised methods.',
+      'Can amplify label noise and requires careful handling of unlabeled examples to avoid degrading the model.',
+      'For example, semi-supervised learning is used to train text classifiers using a few annotated documents plus many unlabeled ones.'
+    );
+  }
+
+  if(/self-supervised/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A training paradigm where models learn from raw data by predicting withheld parts of the input, creating supervisory signals from the data itself.',
+      'pretraining language and vision models, representation learning, feature extraction, and transfer learning.',
+      'masked language modeling, contrastive learning, SimCLR, BYOL, and transformer-based pretraining like BERT.',
+      'Scales to massive unlabeled datasets and produces strong representations for downstream tasks.',
+      'Pretraining can be expensive, and the learned features may not always align with specific downstream objectives.',
+      'For example, self-supervised learning trains language models to predict masked words or image models to reconstruct corrupted patches.'
+    );
+  }
+
+  if(/(machine learning|deep learning|natural language processing|nlp|computer vision|data|model|training|optimizer|loss|regularization|transfer learning|fine-tuning|pretraining|inference|embedding|tokenization)/.test(sample)){
+    if(/machine learning/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A broad field focused on designing algorithms that learn patterns from data to make predictions or decisions.',
+        'classification, regression, clustering, recommendation, and predictive analytics across many domains.',
+        'supervised, unsupervised, reinforcement, and deep learning methods, along with feature engineering and evaluation metrics.',
+        'Can automate decision-making and discover patterns from large datasets.',
+        'Requires careful data curation, proper evaluation, and often significant compute for large models.',
+        'For example, machine learning is used to build recommendation systems, fraud detectors, and image classifiers.'
+      );
+    }
+    if(/deep learning/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A subset of machine learning that uses multi-layer neural networks to learn hierarchical representations from data.',
+        'computer vision, natural language processing, speech recognition, and generative modeling.',
+        'convolutional networks, recurrent networks, transformers, backpropagation, and GPU acceleration.',
+        'Excels at complex pattern recognition and can learn directly from raw data.',
+        'Often needs large datasets and substantial compute, and can be harder to interpret than simpler methods.',
+        'For example, deep learning powers modern image recognition and language generation systems.'
+      );
+    }
+    if(/natural language processing|nlp/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The field of enabling machines to understand, generate, and reason about human language.',
+        'text classification, translation, summarization, chatbots, and information retrieval.',
+        'tokenization, embeddings, transformers, sequence-to-sequence models, and language model pretraining.',
+        'Allows applications to interact naturally with text and speech.',
+        'Language nuances, ambiguity, and cultural context make NLP challenging and error-prone.',
+        'For example, NLP enables virtual assistants, machine translation, and sentiment analysis.'
+      );
+    }
+    if(/computer vision/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The domain of teaching machines to interpret and understand visual information from images and video.',
+        'object detection, segmentation, facial recognition, image search, and scene understanding.',
+        'CNNs, vision transformers, image preprocessing, feature extraction, and visual embeddings.',
+        'Enables automation of tasks that require visual perception.',
+        'Requires large annotated datasets and can struggle with variations in lighting, occlusion, or viewpoint.',
+        'For example, computer vision is used in autonomous driving, medical imaging, and quality inspection.'
+      );
+    }
+    if(/data/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The raw examples, features, and labels that feed machine learning models and determine what they can learn.',
+        'training, validation, testing, analytics, and feature extraction for AI systems.',
+        'data collection, cleaning, augmentation, labeling, and pipeline orchestration.',
+        'Essential for building models that reflect real-world signals and behavior.',
+        'Poor-quality or biased data leads to unreliable or unfair models.',
+        'For example, good data practices are vital when preparing datasets for training predictive models.'
+      );
+    }
+    if(/model/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A mathematical function or system that maps inputs to outputs based on learned parameters.',
+        'prediction, classification, generation, and decision support across AI applications.',
+        'neural networks, decision trees, statistical models, and probabilistic frameworks.',
+        'Encapsulates learned patterns and can generalize to new data when trained well.',
+        'Can overfit, be biased by training data, or be mistaken for causality when only correlations are learned.',
+        'For example, a model can predict customer churn or generate text based on learned patterns.'
+      );
+    }
+    if(/training/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The process of adjusting model parameters so the system improves at a task using example data.',
+        'fitting models to data, optimizing weights, and preparing systems for deployment.',
+        'gradient descent, batches, epochs, loss functions, optimizers, and validation loops.',
+        'Transforms raw algorithms into practical systems by learning from examples.',
+        'Requires monitoring for overfitting and can be computationally expensive for large models.',
+        'For example, training converts a neural network from random initialization to a useful predictor.'
+      );
+    }
+    if(/(optimizer|adam|sgd|learning rate|momentum)/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A method for updating model parameters during training to reduce the loss function.',
+        'model training and convergence for neural networks and other ML algorithms.',
+        'gradient-based optimizers like SGD, Adam, RMSProp, and learning rate schedules.',
+        'Helps models learn effectively and converge to better solutions.',
+        'Requires careful tuning; wrong settings can slow training or cause divergence.',
+        'For example, Adam is a popular optimizer used in many deep learning training workflows.'
+      );
+    }
+    if(/(loss|loss function|cross entropy|mse)/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A mathematical measure of how far a model’s predictions are from the expected targets.',
+        'training models, evaluating performance, and guiding parameter updates.',
+        'mean squared error, cross-entropy, hinge loss, and custom task-specific loss terms.',
+        'Provides a smooth objective for optimization and comparison during training.',
+        'Poor loss design can lead to bad models or unstable training dynamics.',
+        'For example, cross-entropy loss is commonly used for classification tasks.'
+      );
+    }
+    if(/(regularization|dropout|batchnorm|weight decay)/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'Techniques used during training to improve generalization and prevent overfitting.',
+        'stabilizing training, improving robustness, and reducing model complexity.',
+        'dropout, batch normalization, weight decay, early stopping, and data augmentation.',
+        'Helps models generalize better to unseen data and improves stability.',
+        'Can make training more complex and sometimes slow convergence if overused.',
+        'For example, dropout randomly disables units to prevent co-adaptation.'
+      );
+    }
+    if(/(transfer learning|fine-tuning|pretraining)/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'Approaches for reusing a pretrained model or learned features on new tasks.',
+        'adapting large models to specific datasets, reducing training time, and improving performance.',
+        'pretrained weights, adapter layers, prompt tuning, and task-specific fine-tuning.',
+        'Reduces data and compute requirements while leveraging existing knowledge.',
+        'May require careful alignment between the pretraining domain and the new task.',
+        'For example, fine-tuning a language model on customer support transcripts yields a task-specific chatbot.'
+      );
+    }
+    if(/inference/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The process of using a trained model to make predictions on new, unseen data.',
+        'deploying models, real-time prediction, batch scoring, and user-facing AI services.',
+        'model serving, optimized runtime, quantization, and hardware acceleration.',
+        'Delivers the practical value of a trained model in production systems.',
+        'Can be latency-sensitive and may require trade-offs between speed and accuracy.',
+        'For example, inference returns recommendations or classifications for incoming user requests.'
+      );
+    }
+    if(/embedding/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A numerical representation of data in a continuous vector space, capturing semantic similarity.',
+        'search, recommendation, clustering, and downstream NLP or vision tasks.',
+        'word embeddings, sentence embeddings, vector databases, and cosine similarity search.',
+        'Encodes meaning in a format that is easy for models to compare and retrieve.',
+        'May lose fine-grained details and requires good training data to be useful.',
+        'For example, embeddings can represent text or images so similar items are close in vector space.'
+      );
+    }
+    if(/tokenization/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The process of splitting text into pieces like words, subwords, or tokens for model processing.',
+        'natural language processing, language model inputs, and text preprocessing.',
+        'byte-pair encoding, WordPiece, sentencepiece, tokenizers, and vocabulary management.',
+        'Transforms raw text into a structured format that models can understand.',
+        'Poor tokenization can distort meaning or produce too many rare tokens, harming performance.',
+        'For example, tokenization converts sentences into tokens that a transformer can consume.'
+      );
+    }
+    if(/\bactivation\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A nonlinear function applied to a neural network layer output to introduce nonlinearity into the model.',
+        'deep learning models, neural architectures, and gradient-based optimization.',
+        'ReLU, sigmoid, tanh, GELU, and softmax are common activation functions.',
+        'Lets networks learn complex relationships and express nonlinear decision boundaries.',
+        'Choosing the wrong activation can slow training or lead to vanishing gradients.',
+        'For example, ReLU is often used in hidden layers to improve deep network training.'
+      );
+    }
+    if(/\b(?:algorithm|algorithms)\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A procedure or set of rules used to solve a computational problem or train a model.',
+        'model training, data processing, optimization, and inference in AI systems.',
+        'gradient descent, decision trees, clustering, nearest neighbors, and transformer-based learning.',
+        'Defines how data is transformed and how predictions are made.',
+        'Complex or poorly matched algorithms can be inefficient or inaccurate for a task.',
+        'For example, algorithms like SGD, random forests, and transformers power many AI applications.'
+      );
+    }
+    if(/\banalytics\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The practice of exploring data and model results to find insights and guide decisions.',
+        'model evaluation, performance tracking, business intelligence, and research experiments.',
+        'metrics dashboards, visualizations, error analysis, and data profiling.',
+        'Helps teams understand model behavior and improve system outcomes.',
+        'Without proper context, analytics can be misleading or overfit to a specific dataset.',
+        'For example, analytics can reveal why a classifier fails on a particular class of inputs.'
+      );
+    }
+    if(/\b(?:architecture|architectures)\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The structural design of a model or system, defining how components are organized and connected.',
+        'choosing neural network layouts, pipeline components, and deployment topologies.',
+        'encoders, decoders, attention layers, residual blocks, and data preprocessing stages.',
+        'A good architecture balances performance, efficiency, and maintainability.',
+        'The wrong architecture can make a problem harder to solve or require excessive compute.',
+        'For example, transformer architectures dominate NLP while CNN architectures excel at vision tasks.'
+      );
+    }
+    if(/\bbagging\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'An ensemble method that trains multiple models on different sample subsets and averages their predictions.',
+        'reducing variance, improving robustness, and stabilizing predictions for tree-based models.',
+        'bootstrap sampling, voting or averaging, and parallel model training.',
+        'Improves generalization by combining diverse learners.',
+        'Can increase training cost and reduce interpretability compared to a single model.',
+        'For example, bagging is used in random forests to create strong ensembles from many decision trees.'
+      );
+    }
+    if(/\bboosting\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'An ensemble technique that sequentially trains models to correct the errors of previous learners.',
+        'improving accuracy on structured data tasks like classification and regression.',
+        'gradient boosting, AdaBoost, XGBoost, LightGBM, and CatBoost implementations.',
+        'Delivers strong predictive performance with relatively small models.',
+        'Can overfit if not regularized and may require careful tuning of learning rates.',
+        'For example, boosting models often win structured data competitions and business analytics challenges.'
+      );
+    }
+    if(/\bcatboost\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A gradient boosting library that handles categorical features natively and reduces the need for extensive preprocessing.',
+        'structured data modeling, tabular classification, and regression problems.',
+        'decision tree ensembles, categorical encoding, ordered boosting, and feature importance analysis.',
+        'Simplifies working with categories and often delivers strong performance on tabular datasets.',
+        'May still require careful hyperparameter tuning and can be memory-intensive for large datasets.',
+        'For example, CatBoost is used to predict churn or forecast demand from business data.'
+      );
+    }
+    if(/\bclassification\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A supervised learning task where the model assigns input examples to one of several discrete categories.',
+        'spam detection, image tagging, sentiment analysis, and medical diagnosis.',
+        'logistic regression, decision trees, support vector machines, neural networks, and softmax classifiers.',
+        'Makes it possible to automate decisions and categorize data at scale.',
+        'Class imbalance and ambiguous labels can make classification challenging.',
+        'For example, classification can label images as cats or dogs based on learned patterns.'
+      );
+    }
+    if(/\bclustering\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'An unsupervised learning task that groups similar examples together based on their features.',
+        'customer segmentation, anomaly detection, topic discovery, and exploratory analysis.',
+        'k-means, hierarchical clustering, DBSCAN, and Gaussian mixture models.',
+        'Can reveal hidden structure in data without labeled examples.',
+        'Cluster definitions can be subjective and sensitive to scaling or initialization.',
+        'For example, clustering can group users with similar purchasing behavior.'
+      );
+    }
+    if(/\bcompute\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The processing resources required to run training or inference for AI models.',
+        'GPU/TPU accelerated training, distributed model execution, and cloud-based inference.',
+        'hardware accelerators, parallel compute, memory management, and infrastructure orchestration.',
+        'Sufficient compute enables larger models and faster experimentation.',
+        'High compute cost can make some AI applications expensive or environmentally costly.',
+        'For example, large language models require substantial compute during pretraining and inference.'
+      );
+    }
+    if(/\bdecoder\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A model component that maps latent or encoded representations back into target outputs.',
+        'sequence generation, image synthesis, translation, and reconstructing inputs from compressed codes.',
+        'autoregressive decoding, attention layers, beam search, and output projection.',
+        'Allows models to generate complex outputs from learned representations.',
+        'Decoding can be slow for long sequences and may produce errors if the latent space is imperfect.',
+        'For example, a decoder produces natural language text from a transformer encoder representation.'
+      );
+    }
+    if(/\bencoder\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A model component that converts input data into a compact representation or embedding.',
+        'text encoding, image feature extraction, and representation learning for downstream tasks.',
+        'embedding layers, transformer encoders, convolutional encoders, and pretrained encoders.',
+        'Produces meaningful internal features that are easier for other model components to use.',
+        'Encoder quality determines how much usable information is preserved in the representation.',
+        'For example, an encoder turns sentences into dense vectors for search or classification.'
+      );
+    }
+    if(/\bensemble\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A collection of models whose outputs are combined to improve overall performance.',
+        'bagging, boosting, stacking, and voting systems for more robust predictions.',
+        'multiple learners, aggregation strategies, weighted averaging, and ensemble selection.',
+        'Often reduces variance and improves generalization compared to a single model.',
+        'Can increase complexity, inference cost, and make the system harder to interpret.',
+        'For example, an ensemble can average predictions from decision trees, SVMs, and neural networks.'
+      );
+    }
+    if(/\bevaluation\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The process of measuring how well a model performs on held-out data or real-world tasks.',
+        'comparing models, tuning hyperparameters, and deciding when to deploy.',
+        'test sets, cross-validation, metrics such as accuracy and F1, and error analysis.',
+        'Provides objective feedback on model quality and expected behavior.',
+        'Improper evaluation can overstate performance if data leakage or bias exists.',
+        'For example, evaluation can show whether a classifier generalizes to new examples.'
+      );
+    }
+    if(/\bgelu\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A smooth activation function commonly used in transformer models.',
+        'deep learning models, especially in modern transformer architectures.',
+        'Gaussian error linear units, nonlinearity, and layer activations.',
+        'Improves model performance by avoiding hard saturation of activation values.',
+        'Computationally more expensive than simpler functions like ReLU.',
+        'For example, GELU is used in BERT and GPT-style transformers to improve accuracy.'
+      );
+    }
+    if(/\blightgbm\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A gradient boosting framework optimized for large datasets and fast training.',
+        'structured data tasks, ranking problems, and high-performance model training.',
+        'leaf-wise tree growth, histogram-based splitting, and GPU acceleration.',
+        'Often faster and more memory-efficient than traditional gradient boosting libraries.',
+        'Requires careful tuning and can overfit if trees grow too deep.',
+        'For example, LightGBM is used in production for large-scale tabular prediction systems.'
+      );
+    }
+    if(/\brandom forest\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'An ensemble of decision trees built on bootstrap samples with random feature selection.',
+        'classification, regression, and ranking tasks with tabular or structured data.',
+        'tree ensembles, bagging, feature randomness, and out-of-bag evaluation.',
+        'Robust to overfitting and performs well with minimal tuning.',
+        'Can be slower to predict than a single tree and less interpretable than simpler models.',
+        'For example, random forests are used for fraud detection, finance, and medical predictions.'
+      );
+    }
+    if(/\bregression\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A supervised learning task where the model predicts a continuous numerical value.',
+        'price forecasting, demand prediction, risk estimation, and scientific modeling.',
+        'linear regression, ridge regression, tree-based regression, and neural regressors.',
+        'Allows forecasting and quantifying relationships between variables.',
+        'Sensitive to outliers and may require careful feature scaling and regularization.',
+        'For example, regression can predict house prices from property features.'
+      );
+    }
+    if(/\bscaling\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The adjustment of data or model size to meet performance, accuracy, or deployment targets.',
+        'scaling datasets, models, training infrastructure, and inference capacity.',
+        'horizontal scaling, vertical scaling, model pruning, and distributed training.',
+        'Helps systems handle larger workloads and improve throughput.',
+        'Poor scaling can raise costs and introduce latency or coordination challenges.',
+        'For example, scaling a model may mean moving from a single GPU to a distributed cluster.'
+      );
+    }
+    if(/\bsimulation\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'Using models or synthetic environments to imitate real-world systems and generate training data.',
+        'reinforcement learning, safety testing, synthetic data generation, and scenario analysis.',
+        'physics engines, environment simulators, synthetic sensors, and virtual agents.',
+        'Enables experimentation when real-world data is unavailable or expensive to collect.',
+        'Simulators can be inaccurate if they do not capture all real-world complexities.',
+        'For example, robotics research uses simulation to train policies before deploying on hardware.'
+      );
+    }
+    if(/\bsparsity\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The property of having many zero or near-zero values in model weights or representations.',
+        'model compression, efficient inference, and reducing storage for large models.',
+        'sparse matrices, pruning, quantization, and sparse tensor computation.',
+        'Reduces memory and compute requirements while preserving performance.',
+        'Sparse operations can be harder to optimize on general-purpose hardware.',
+        'For example, sparse models store fewer parameters and can run faster in resource-constrained settings.'
+      );
+    }
+    if(/\bsvm\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A support vector machine is a supervised model that finds a hyperplane maximizing class separation.',
+        'binary classification, text categorization, and small-scale regression problems.',
+        'kernel methods, support vectors, margin maximization, and soft margins.',
+        'Often effective with limited data and well-defined feature spaces.',
+        'Can be slow on large datasets and sensitive to feature scaling.',
+        'For example, SVMs are used in image recognition and spam detection when features are well-engineered.'
+      );
+    }
+    if(/\btext\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'Text refers to natural language content used as input or output for NLP models.',
+        'document understanding, chatbots, translation, summarization, and sentiment analysis.',
+        'tokenization, embeddings, language models, sequence encoders, and text preprocessing.',
+        'Text data enables machines to work with human language and information.',
+        'Natural language is ambiguous and noisy, making text processing challenging.',
+        'For example, text inputs are used to train chatbots and search engines.'
+      );
+    }
+    if(/\btoken\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A discrete unit of text such as a word, subword, or symbol that models process as input.',
+        'language model inputs, embedding lookup, and sequence modeling.',
+        'tokenizers, vocabularies, token IDs, and positional encodings.',
+        'Allows raw text to be represented in a format models can understand.',
+        'Token boundaries can split words in unexpected ways, affecting meaning.',
+        'For example, tokens are the basic units used by GPT to encode and generate language.'
+      );
+    }
+    if(/\bxgboost\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A high-performance gradient boosting library optimized for speed and accuracy.',
+        'structured prediction tasks, ranking, and classification on tabular data.',
+        'tree ensembles, regularization, sparse feature handling, and parallel computation.',
+        'Often produces state-of-the-art results on tabular datasets.',
+        'Can require careful hyperparameter tuning and may be slower to train than simpler models.',
+        'For example, XGBoost is used in fraud detection and customer churn prediction.'
+      );
+    }
+    if(/\bvision\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The field of interpreting visual information such as images and video with algorithms.',
+        'image classification, object detection, segmentation, and video analytics.',
+        'convolutional networks, vision transformers, feature extraction, and visual embeddings.',
+        'Enables systems to perceive and act on visual inputs.',
+        'Visual data can vary widely in appearance, making generalization challenging.',
+        'For example, vision systems help autonomous vehicles understand the road scene.'
+      );
+    }
+    if(/\breinforcement learning\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A learning paradigm in which agents learn to make decisions by receiving rewards from the environment.',
+        'policy optimization, robotics control, game playing, and sequential decision-making.',
+        'reinforcement learning algorithms, reward shaping, value functions, and exploration strategies.',
+        'Can learn complex behaviors from experience without explicit supervision.',
+        'Often requires many interactions and careful reward design to avoid unintended behavior.',
+        'For example, reinforcement learning trains agents to play games, control robots, or optimize recommendations.'
+      );
+    }
+    if(/\blearning\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'The process of improving a model’s performance from data or experience.',
+        'supervised, unsupervised, self-supervised, and reinforcement learning tasks.',
+        'training loops, loss optimization, representation learning, and exploration strategies.',
+        'Forms the foundation of AI systems by enabling models to adapt to new data.',
+        'Different learning styles require different data, feedback, and evaluation methods.',
+        'For example, learning can mean training a classifier from labeled examples or fine-tuning a language model.'
+      );
+    }
+    if(/\bsupervised\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A learning setting where models are trained with labeled examples pairing inputs to desired outputs.',
+        'classification, regression, and sequence labeling tasks with explicit target annotations.',
+        'loss functions, labeled datasets, supervised architectures, and evaluation metrics.',
+        'Often leads to accurate models when high-quality labeled data is available.',
+        'Requires labeled data, which can be expensive and time-consuming to collect.',
+        'For example, supervised learning trains a classifier to label images or predict prices.'
+      );
+    }
+    if(/\bunsupervised\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A learning setting where models find structure in unlabeled data without explicit targets.',
+        'clustering, representation learning, dimensionality reduction, and anomaly detection.',
+        'autoencoders, clustering algorithms, probabilistic models, and self-supervised objectives.',
+        'Can discover hidden patterns and features without human labels.',
+        'Interpretability and evaluation are more difficult because ground truth is not available.',
+        'For example, unsupervised learning groups similar images and learns compressed representations.'
+      );
+    }
+    if(/\b(?:few shot|few-shot)\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A learning scenario in which a model adapts to a new task using only a few examples.',
+        'few-shot classification, prompting, and transfer learning for low-data tasks.',
+        'meta-learning, prompt engineering, and pretrained foundation models.',
+        'Allows fast adaptation when labeled examples are scarce.',
+        'Performance can degrade with very limited examples or out-of-domain tasks.',
+        'For example, few-shot learning helps a language model follow new instructions from a handful of examples.'
+      );
+    }
+    if(/\b(?:zero shot|zero-shot)\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A setting where a model performs a task without having seen any direct examples of that task during training.',
+        'generalization to unseen classes, open-ended question answering, and prompt-based tasks.',
+        'transfer learning, pretrained representations, and semantic alignment between tasks.',
+        'Enables broader task coverage without task-specific labeled data.',
+        'Accuracy can be lower than with task-specific training, especially for very different tasks.',
+        'For example, zero-shot models classify images or answer questions they were never explicitly trained on.'
+      );
+    }
+    if(/\bdata science\b/.test(sample)){
+      return formatKeywordDetails(
+        label,
+        'A field that combines statistics, machine learning, and domain knowledge to extract insights from data.',
+        'data preparation, modeling, reporting, and decision support across industries.',
+        'data pipelines, exploratory analysis, predictive modeling, and visualization tools.',
+        'Bridges data collection and actionable business or research outcomes.',
+        'Success depends on data quality, domain knowledge, and appropriate modeling choices.',
+        'For example, data science teams build dashboards, forecasts, and recommendation systems.'
+      );
+    }
+  }
+
+  if(/transformer|bert|gpt|attention/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A neural architecture or mechanism centered on self-attention, letting models weigh input elements by relevance rather than processing sequentially.',
+      'language modeling, translation, summarization, question answering, and multimodal tasks such as image captioning.',
+      'encoder-decoder and decoder-only transformers, multi-head attention, positional encoding, layer normalization, and large-scale pretrained models.',
+      'Excellent at capturing long-range dependencies, highly parallelizable, and the basis for state-of-the-art NLP and multimodal systems.',
+      'Requires large amounts of compute and data, can be memory-intensive, and sometimes struggles with very precise logical reasoning.',
+      'For example, GPT generates text, BERT encodes sentences for search, and attention improves how models focus on context.'
+    );
+  }
+
+  if(/cnn/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A convolutional neural network designed to process spatially structured data like images using convolutional filters.',
+      'image classification, object detection, segmentation, and video analysis.',
+      'convolutional layers, pooling, ReLU activation, batch normalization, residual connections, and transfer learning.',
+      'Highly effective for visual tasks, efficient parameter sharing, and strong generalization on image data.',
+      'Less effective for data without spatial structure and can require large labeled datasets for best results.',
+      'For example, CNNs power photo tagging, medical image analysis, and autonomous vehicle perception.'
+    );
+  }
+
+  if(/rnn|lstm|gru/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A recurrent neural network architecture for modeling sequential data by maintaining a hidden state across time steps.',
+      'speech recognition, language modeling, translation, and time-series forecasting.',
+      'RNN cells, gated units like LSTM and GRU, sequence unrolling, and backpropagation through time.',
+      'Good for capturing order and temporal dependencies in sequence data.',
+      'Can be slow to train, suffer from vanishing gradients, and struggle with long-range context compared to transformers.',
+      'For example, LSTMs and GRUs model text sequences, speech signals, and stock prices.'
+    );
+  }
+
+  if(/gan/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A generative adversarial network that pits a generator against a discriminator to produce realistic synthetic data.',
+      'image generation, style transfer, data augmentation, and creative content synthesis.',
+      'generator and discriminator networks, adversarial loss, latent vectors, and training heuristics like Wasserstein loss.',
+      'Can produce high-quality, realistic samples and learn complex distributions without explicit likelihoods.',
+      'Training is unstable, sensitive to hyperparameters, and can suffer from mode collapse.',
+      'For example, GANs generate photorealistic images and new artistic styles from random noise.'
+    );
+  }
+
+  if(/vae/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A variational autoencoder that learns a probabilistic latent representation and generates new samples by decoding latent variables.',
+      'data generation, anomaly detection, dimensionality reduction, and latent-space exploration.',
+      'encoder-decoder networks, variational inference, Kullback-Leibler divergence, and latent-space sampling.',
+      'Provides a principled probabilistic model and smooth latent representations useful for interpolation.',
+      'Sample quality may be blurrier than adversarial models, and training requires balancing reconstruction and regularization losses.',
+      'For example, VAEs generate images, reconstruct noisy inputs, and learn compact representations for downstream tasks.'
+    );
+  }
+
+  if(/autoencoder/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A network trained to compress input data into a lower-dimensional code and then reconstruct it back to the original form.',
+      'dimensionality reduction, denoising, anomaly detection, and feature learning.',
+      'encoder and decoder layers, bottleneck representations, reconstruction loss, and regularization techniques.',
+      'Useful for learning compact representations and removing noise from data.',
+      'Reconstruction quality can suffer if the bottleneck is too narrow or the model is too simple.',
+      'For example, autoencoders can denoise images or compress sensor data while preserving key structure.'
+    );
+  }
+
+  if(/diffusion/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A generative process that learns to reverse noise addition, generating samples by progressively denoising random inputs.',
+      'text-to-image synthesis, image editing, audio generation, and multimodal content creation.',
+      'denoising score matching, stochastic differential equations, U-Nets, and iterative sampling schedules.',
+      'Produces high-fidelity outputs and is robust for many generation tasks.',
+      'Sampling can be slow due to many iterative steps, and models can be compute-intensive to train.',
+      'For example, diffusion models generate realistic images from text prompts and can perform fine-grained editing.'
+    );
+  }
+
+  if(/prompt|prompting|prompt engineering/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'The practice of designing input text or instructions to steer large language models toward useful outputs.',
+      'information retrieval, text generation, question answering, code synthesis, and conversational behavior shaping.',
+      'prompt templates, few-shot examples, chain-of-thought prompting, prompt tuning, and instruction design.',
+      'Can dramatically improve model responses without retraining the model.',
+      'High-quality prompts are often ad-hoc, brittle, and may need constant refinement for different tasks.',
+      'For example, prompt engineering is used to make ChatGPT provide concise summaries, code examples, or creative explanations.'
+    );
+  }
+
+  if(/pytorch/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A deep learning framework built for flexibility and research, with strong support for dynamic computation graphs.',
+      'research experimentation, model prototyping, and production deployment of neural networks.',
+      'automatic differentiation, dynamic tensors, TorchScript, CUDA integration, and distributed training.',
+      'Very intuitive API for researchers and strong community support; excellent debugging experience.',
+      'Can require more boilerplate than higher-level frameworks for deployment and may need optimization for large-scale production.',
+      'For example, PyTorch is used to build transformer models, image classifiers, and reinforcement learning agents.'
+    );
+  }
+
+  if(/tensorflow/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A machine learning platform for building and deploying models at scale, encompassing both research and production.',
+      'training neural networks, serving models, mobile/edge deployment, and data pipeline integration.',
+      'Keras APIs, SavedModels, TensorFlow Serving, TPU support, and TensorBoard for visualization.',
+      'Strong deployment ecosystem and support for production workflows across platforms.',
+      'The API can be complex, especially for lower-level operations, and version compatibility can be an issue.',
+      'For example, TensorFlow is used to deploy image recognition and speech systems in production.'
+    );
+  }
+
+  if(/keras/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A high-level neural network API that simplifies model building with intuitive layers and training loops.',
+      'quick experimentation, prototyping neural architectures, and educational use.',
+      'sequential and functional APIs, layers, callbacks, optimizers, and model.fit training loops.',
+      'Very easy to use and fast to prototype deep learning models.',
+      'Less flexible for highly custom architectures without dropping to lower-level frameworks.',
+      'For example, Keras is used to assemble convolutional and recurrent models with minimal code.'
+    );
+  }
+
+  if(/jax/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A numerical computing library for high-performance machine learning research with composable transformations.',
+      'fast gradient-based research, functionally defined models, and performance-critical experiments.',
+      'XLA compilation, automatic differentiation, JIT compilation, and vectorization using vmap and pmap.',
+      'Extremely fast and composable for research experiments that need fine control over gradients.',
+      'Requires a more functional programming style and can be harder for newcomers than imperative APIs.',
+      'For example, JAX is used in advanced research for custom model training and optimization.'
+    );
+  }
+
+  if(/sklearn|scikit-learn/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A Python library for classical machine learning algorithms, preprocessing, and evaluation.',
+      'feature extraction, model selection, classification, regression, and clustering.',
+      'estimators, pipelines, cross-validation, grid search, and preprocessing transformers.',
+      'Easy-to-use APIs, strong documentation, and solid tooling for traditional ML workflows.',
+      'Not designed for large-scale deep learning or massive datasets without additional tooling.',
+      'For example, scikit-learn trains random forests, SVMs, and evaluates models using cross-validation.'
+    );
+  }
+
+  if(/pandas/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A data manipulation library for structured tabular data and time series in Python.',
+      'data loading, cleaning, transformation, aggregation, and exploratory analysis.',
+      'DataFrames, Series, groupby operations, joins, reshaping, and time-series utilities.',
+      'Makes complex data processing easy and expressive with a familiar tabular API.',
+      'Can be memory-intensive and slower for extremely large datasets unless used with optimized backends.',
+      'For example, pandas loads CSV files, transforms columns, and prepares data for machine learning pipelines.'
+    );
+  }
+
+  if(/numpy/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A foundational numerical library for array computing and linear algebra in Python.',
+      'matrix math, tensor operations, vectorized computation, and scientific modeling.',
+      'ndarrays, broadcasting, ufuncs, linear algebra routines, and random number generation.',
+      'Highly efficient for numerical workloads and forms the basis for many AI libraries.',
+      'Pure Python loops are still slower; users need to work in a vectorized style for best performance.',
+      'For example, NumPy arrays are used to represent input tensors and compute gradients in AI code.'
+    );
+  }
+
+  if(/gpu|cuda/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'Hardware acceleration for parallel matrix and tensor operations using graphics processors.',
+      'training deep neural networks, accelerating inference, and running large-scale simulations.',
+      'CUDA kernels, GPU memory, tensor cores, parallel compute threads, and specialized libraries like cuDNN.',
+      'Massively speeds up training and inference for large neural networks.',
+      'Requires specialized hardware, careful memory management, and can be expensive to provision.',
+      'For example, GPUs are used to train transformers and convolutional networks much faster than CPUs.'
+    );
+  }
+
+  if(/tpu/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A Google-designed accelerator optimized for tensor operations and large-scale model training.',
+      'training and serving neural networks at scale, especially transformer-based models.',
+      'TPU cores, matrix multiply units, XLA compilation, and optimized tensor pipelines.',
+      'Very efficient for large model training and inference workloads.',
+      'Primarily available in cloud environments and can require adaptation from GPU code.',
+      'For example, TPUs are used to accelerate training of large language models in cloud services.'
+    );
+  }
+
+  if(/accuracy/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'The proportion of predictions that a model got correct out of all predictions made.',
+      'evaluating classifiers, comparing model versions, and measuring overall correctness.',
+      'confusion matrices, prediction labels, and test datasets.',
+      'Easy to understand and useful for balanced datasets.',
+      'Can be misleading when classes are imbalanced, because it ignores class-specific errors.',
+      'For example, 95% accuracy may still be poor if 95% of examples belong to one class.'
+    );
+  }
+
+  if(/precision/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'The fraction of positive predictions that are truly positive.',
+      'evaluating model usefulness where false positives are costly, such as spam detection.',
+      'confusion matrix counts, true positives, and false positives.',
+      'Helps measure how reliable positive predictions are.',
+      'May ignore false negatives, so it is not sufficient alone when missing positives is costly.',
+      'For example, high precision means a model rarely labels a negative sample as positive.'
+    );
+  }
+
+  if(/recall/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'The fraction of actual positives that the model correctly identifies.',
+      'evaluating models where missing a positive case is expensive, such as medical diagnosis.',
+      'confusion matrix counts, true positives, and false negatives.',
+      'Measures coverage of the positive class and helps catch as many true cases as possible.',
+      'Can trade off against precision, leading to more false positives when maximized alone.',
+      'For example, high recall means the model captures most of the actual positive examples.'
+    );
+  }
+
+  if(/f1/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'The harmonic mean of precision and recall, balancing both types of error.',
+      'evaluating classification models when precision and recall are both important.',
+      'precision, recall, and harmonic mean computations.',
+      'Provides a single balanced metric when classes are imbalanced.',
+      'Can still hide detail about the precision/recall trade-off and is not ideal for all use cases.',
+      'For example, F1 is useful when both false positives and false negatives are costly.'
+    );
+  }
+
+  if(/roc|auc/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A performance measurement that evaluates a classifier’s ability to distinguish between classes across thresholds.',
+      'comparing models, selecting thresholds, and evaluating binary classifiers in imbalanced settings.',
+      'ROC curves, true positive rate, false positive rate, and area under the curve calculations.',
+      'Shows performance across decisions rather than at a single threshold.',
+      'Can be less intuitive than accuracy and may not reflect actual operating points.',
+      'For example, AUC close to 1 indicates strong separability between classes.'
+    );
+  }
+
+  if(/validation/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'The process of evaluating a trained model on held-out data to estimate generalization performance.',
+      'hyperparameter tuning, early stopping, and model selection.',
+      'validation datasets, cross-validation splits, metrics rollout, and evaluation pipelines.',
+      'Helps prevent overfitting and identifies models that generalize better.',
+      'If improperly configured, validation can still overfit or yield misleading estimates.',
+      'For example, validation sets are used to choose the best model before testing on unseen data.'
+    );
+  }
+
+  if(/overfitting/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'When a model learns noise or idiosyncrasies of the training data instead of the underlying pattern.',
+      'diagnosing model generalization issues, choosing regularization, and trimming complexity.',
+      'regularization methods, dropout, cross-validation, early stopping, and simpler models.',
+      'Helps identify when a model is too complex for the data.',
+      'Means the model may perform well on training data but poorly on new examples.',
+      'For example, an overfitted model may memorize training images and fail on new photographs.'
+    );
+  }
+
+  if(/underfitting/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'When a model is too simple to capture the patterns in the data.',
+      'diagnosing when models need more capacity, better features, or longer training.',
+      'model selection, feature engineering, and architecture changes.',
+      'Highlights that the model is not learning enough from the data.',
+      'Means the model will perform poorly on both training and test data.',
+      'For example, a linear model may underfit complex nonlinear relationships in the data.'
+    );
+  }
+
+  if(/dataset|datasets/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A structured collection of examples used to train, validate, and test machine learning models.',
+      'supervised learning tasks, benchmarking of models, and data analysis.',
+      'CSV/JSON files, databases, data loaders, annotation tools, and dataset repositories.',
+      'Enables systematic model development and comparison across methods.',
+      'Quality issues or bias in datasets can lead to poor or unfair model behavior.',
+      'For example, ImageNet and COCO are popular datasets used to train vision models.'
+    );
+  }
+
+  if(/feature engineering/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'The process of transforming raw data into features that improve model learning.',
+      'preprocessing data, creating informative variables, and encoding domain knowledge.',
+      'normalization, encoding, scaling, interaction terms, embeddings, and feature selection.',
+      'Can dramatically improve model performance and reduce learning complexity.',
+      'Requires domain expertise and can be time-consuming to do well.',
+      'For example, feature engineering turns timestamps into seasonality and extracts keywords from text.'
+    );
+  }
+
+  if(/label/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'The target output or ground truth that a model is trained to predict.',
+      'supervised learning, evaluation, and error analysis.',
+      'annotated datasets, human labeling tools, and label taxonomies.',
+      'Provides explicit guidance for model training and evaluation.',
+      'Labels can be expensive, inconsistent, or biased, and poor labels lead to poor models.',
+      'For example, labels can be sentiment ratings for text or object categories for images.'
+    );
+  }
+
+  if(/feature\b/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'An input variable or attribute used by a model to make predictions.',
+      'representing data properties, enabling model training, and capturing signal from raw inputs.',
+      'numeric, categorical, text, image, and embedding representations in feature vectors.',
+      'Allows models to reason over meaningful aspects of the data.',
+      'Poor features can limit model performance even with a strong algorithm.',
+      'For example, age, pixel intensity, and word frequency are common features.'
+    );
+  }
+
+  if(/training data/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'The input examples and associated targets used to teach a model during training.',
+      'model fitting, pattern discovery, and shaping the model’s learned behavior.',
+      'data pipelines, labeling workflows, augmentation, and batching.' ,
+      'Directly determines what the model learns and how well it generalizes.',
+      'If training data is biased or noisy, the model will inherit those flaws.',
+      'For example, training data for a chatbot includes question-answer pairs and dialogue examples.'
+    );
+  }
+
+  if(/agent/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A system that combines models, tools, and decision-making logic to perform tasks autonomously.',
+      'automating workflows, information retrieval, tool use, and sequential reasoning.',
+      'language models, action policies, tool APIs, planners, and state tracking.',
+      'Can solve complex multi-step tasks and use external knowledge sources.',
+      'Can be brittle, prone to hallucinations, and difficult to align with safety constraints.',
+      'For example, an agent can answer questions by searching the web and composing the result.'
+    );
+  }
+
+  if(/multimodal/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A model or system that processes more than one type of data such as text, images, audio, or video.',
+      'image captioning, video understanding, speech+text interfaces, and cross-modal retrieval.',
+      'vision-language transformers, CLIP, multimodal encoders, and joint embedding spaces.',
+      'Enables richer, more flexible interactions with content across modalities.',
+      'Requires aligning disparate data types and often needs more compute and data.',
+      'For example, multimodal models can describe images in text or answer questions about video content.'
+    );
+  }
+
+  if(/foundation model/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A large pretrained model that can be adapted to many downstream tasks with limited additional training.',
+      'transfer learning, few-shot learning, search, classification, and generation tasks.',
+      'large-scale pretraining, fine-tuning, prompt tuning, adapters, and distillation.',
+      'Offers broad capability and reduces the need to train separate models for each task.',
+      'Can be expensive to train and may carry biases or unwanted behavior from pretraining data.',
+      'For example, foundation models like GPT and CLIP are adapted for dialogue, search, and vision.'
+    );
+  }
+
+  if(/llm|chatgpt|gpt/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A large language model trained to generate and understand natural language at scale.',
+      'chatbots, summarization, coding assistance, drafting content, and conversational search.',
+      'transformer architectures, unsupervised pretraining, tokenization, and autoregressive decoding.',
+      'Can generate fluent text and answer a wide range of questions with minimal task-specific tuning.',
+      'May hallucinate, exhibit bias, and require prompt design for reliable outputs.',
+      'For example, GPT can write code, answer questions, and produce creative writing on demand.'
+    );
+  }
+
+  if(/claude|gemini/.test(sample)){
+    return formatKeywordDetails(
+      label,
+      'A conversational AI assistant built on large model technology for dialogue and task completion.',
+      'customer support, virtual assistants, document analysis, and collaborative workflows.',
+      'large language models, dialogue management, natural language understanding, and API integrations.',
+      'Can provide human-like assistance and carry context across longer conversations.',
+      'May require guardrails for safety, privacy, and consistent behavior.',
+      'For example, Claude and Gemini are used in chat interfaces to answer questions and automate tasks.'
+    );
+  }
+
+  if(isCompare){
+    return formatKeywordDetails(
+      label,
+      'A term in AI/ML whose specific meaning depends on the concepts being compared.',
+      'framing comparisons between models, techniques, evaluation metrics, or architectures.',
+      'analytical reasoning, benchmarking, literature review, and example use cases.',
+      'Helps clarify trade-offs and choose the best approach for a problem.',
+      'Can oversimplify complex differences if not grounded in details.',
+      'For example, comparing transformer and CNN architectures illuminates their strengths for language versus vision tasks.'
+    );
+  }
+
+  if(isHow||isWhy){
+    return formatKeywordDetails(
+      label,
+      'A concept used to explain mechanisms and motivations in AI systems.',
+      'understanding model behavior, debugging, and designing system improvements.',
+      'analysis, diagnostics, ablation studies, and performance evaluation.',
+      'Helps developers build more explainable and reliable systems.',
+      'Can be vague if the underlying concept is not clearly defined.',
+      'For example, asking why a model makes a prediction helps identify bias or data issues.'
+    );
+  }
+
+  return formatKeywordDetails(
+    label,
+    'A concept in AI and machine learning that captures a specific technique, model, data process, or system behavior.',
+    'solving problems, improving performance, and informing system design decisions.',
+    'algorithms, data pipelines, model architectures, and deployment tools.',
+    'Provides a structured way to reason about AI technologies and choose the right tool for the task.',
+    'Can be too broad when used without concrete examples or domain context.',
+    'For example, understanding a keyword lets engineers connect concepts to practical solutions.'
+  );
+}
+
+function synthesizeAnswer(query,docs){
+  const q=query.toLowerCase();
+  const titles = docs.map(d=>d.entry.title);
+  let reply = `I found relevant information from ${titles.join(' and ')}. `;
+  if(q.includes('why')){
+    reply += 'Here is why: ';
+  } else if(q.includes('how')){
+    reply += 'Here is how it works: ';
+  } else if(q.includes('when')){
+    reply += 'Here is the timeline: ';
+  } else if(q.includes('difference') || q.includes('compare')){
+    reply += 'Here are the differences: ';
+  }
+  reply += docs[0].entry.content;
+  if(docs.length > 1){
+    reply += `\n\nAdditional context from ${docs[1].entry.title}: ${docs[1].entry.content}`;
+  }
+  if(docs.length > 2){
+    reply += `\n\nAlso relevant: ${docs[2].entry.title}: ${docs[2].entry.content}`;
+  }
+  reply += '\n\nIf you want, ask a follow-up about one of these topics for a more detailed answer.';
+  return reply;
+}
+
+function buildRAGReply(query){
+  const explicit=findExplicitAnswer(query);
+  if(explicit){
+    return explicit;
+  }
+
+  const predictedTopic = predictPatternLabel(query);
+  if(predictedTopic){
+    const predictedAnswer = generateKeywordResponse(predictedTopic, query);
+    if(predictedAnswer){
+      return predictedAnswer;
+    }
+  }
+
+  const keywordAnswer=findKeywordAnswer(query);
+  if(keywordAnswer){
+    return keywordAnswer;
+  }
+
+  const docs=retrieveRelevantDocs(query,3);
+  if(docs.length === 0){
+    return 'I could not find a strong match in my AI knowledge base. Please ask about a specific AI/ML topic, period, or technology such as deep learning, transformers, reinforcement learning, generative AI, multimodal models, or AI ethics.';
+  }
+
+  return synthesizeAnswer(query,docs);
+}
+
+async function queryRemoteLLM(query){
+  const apiKey = document.getElementById('apiKeyInput').value.trim();
+  if(!apiKey){
+    return null;
+  }
+
+  const docs=retrieveRelevantDocs(query,5);
+  const referenceText = docs.length
+    ? docs.map((d,i)=>`Reference ${i+1}: ${d.entry.title}\n${d.entry.content}`).join('\n\n')
+    : 'No relevant documents were found in the local knowledge base for this query.';
+
+  const payload = {
+    model: 'gpt-3.5-turbo',
+    messages:[
+      {role:'system',content: SYSTEM + '\n\nUse the reference documents below to answer the user as accurately as possible. If the question is clearly related to AI history, eras, or technologies, cite the appropriate era and the most relevant details. Do not invent facts. If the user asks something outside the reference scope, answer based on established AI knowledge and explicitly note that the reference material was limited. For definition questions, provide a concise definition in one or two focused paragraphs. For technical questions, keep the response direct and avoid generic historical summaries unless they are directly relevant.'},
+      {role:'user',content:`Reference documents:\n${referenceText}\n\nUser question: ${query}`}
+    ],
+    temperature:0.2,
+    max_tokens:520,
+    top_p:0.9,
+    frequency_penalty:0.2,
+    presence_penalty:0.0
+  };
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+apiKey
+      },
+      body:JSON.stringify(payload)
+    });
+
+    if(!response.ok){
+      const errorText = await response.text();
+      throw new Error(`${response.status} ${response.statusText}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data?.choices?.[0]?.message?.content?.trim() || null;
+  } catch(err){
+    console.warn('LLM request failed', err);
+    return null;
+  }
+}
+
+async function callClaude(msg){
+  setTyping(true);
+  await new Promise(resolve => setTimeout(resolve, 450));
+
+  let reply = null;
+  const apiKey = document.getElementById('apiKeyInput').value.trim();
+  if(apiKey){
+    reply = await queryRemoteLLM(msg);
+  }
+
+  if(!reply){
+    reply = buildRAGReply(msg);
+  }
+
+  setTyping(false);
+  lastBotQuery = msg;
+  addMsg(reply,true,msg);
+}
+
+async function sendMsg(){
+  const inp=document.getElementById('chatInput');
+  const t=inp.value.trim();
+  if(!t)return;
+  inp.value='';inp.style.height='auto';
+  lastUserQuery = t;
+  addMsg(t,false);
+  await callClaude(t);
+}
+
+async function sq(t){
+  lastUserQuery = t;
+  addMsg(t,false);
+  await callClaude(t);
+}
+
+async function sendEraChat(idx){
+  const display=`Tell me everything about the ${ERA_NAMES[idx]} era of AI.`;
+  addMsg(display,false);
+  await callClaude(ERA_PROMPTS[idx]);
+  // scroll chat into view on mobile
+  document.querySelector('.chat-wrap').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+</script>
+</body>
+</html>
